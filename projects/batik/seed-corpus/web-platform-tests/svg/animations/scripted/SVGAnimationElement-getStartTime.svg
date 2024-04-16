@@ -1,0 +1,4 @@
+<svg height="0">
+  <animate attributeName="visibility" begin="1s; 3s" dur="1s"/>
+  <animate attributeName="visibility" begin="1s; 3s" dur="1s" fill="freeze"/>
+</svg>

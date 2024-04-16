@@ -1,0 +1,15 @@
+<svg>
+  <animate id="anim" attributeName="visibility" to="visible" begin="0s" dur="2s" repeatCount="4"/>
+  <rect x="0" y="0" width="50" height="50" fill="lime">
+    <set attributeName="fill" to="red" begin="anim.repeat(0)"/>
+  </rect>
+  <rect x="50" y="0" width="50" height="50" fill="red">
+    <set attributeName="fill" to="lime" begin="anim.repeat(1)"/>
+  </rect>
+  <rect x="0" y="50" width="50" height="50" fill="red">
+    <set attributeName="fill" to="lime" begin="anim.repeat(2)"/>
+  </rect>
+  <rect x="50" y="50" width="50" height="50" fill="red">
+    <set attributeName="fill" to="lime" begin="anim.repeat(3)"/>
+  </rect>
+</svg>

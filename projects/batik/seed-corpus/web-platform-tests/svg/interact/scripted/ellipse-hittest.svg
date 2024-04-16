@@ -1,0 +1,15 @@
+<svg id="svg" width="450" height="300">
+  <rect id="border" x="0.5" y="0.5" width="449" height="299" stroke="#000" stroke-width="1" fill="none"/>
+
+  <ellipse id="ell1" cx="130" cy="30" rx="100" ry="15" stroke="#ccf" fill="none" stroke-width="20"/>
+  <ellipse pointer-events="none" cx="130" cy="30" rx="110" ry="25" stroke="gray" fill="none"/>
+  <ellipse pointer-events="none" cx="130" cy="30" rx="90" ry="5" stroke="gray" fill="none"/>
+
+  <ellipse id="ell2" cx="130" cy="180" rx="100" ry="100" stroke="#ccf" fill="none" stroke-width="30"/>
+  <ellipse pointer-events="none" cx="130" cy="180" rx="115" ry="115" stroke="gray" fill="none"/>
+  <ellipse pointer-events="none" cx="130" cy="180" rx="85" ry="85" stroke="gray" fill="none"/>
+
+  <ellipse id="ell3" cx="340" cy="155" rx="15" ry="100" stroke="#ccf" fill="none" stroke-width="20" transform="rotate(30 340 155)"/>
+  <ellipse pointer-events="none" cx="340" cy="155" rx="25" ry="110" stroke="gray" fill="none" transform="rotate(30 340 155)"/>
+  <ellipse pointer-events="none" cx="340" cy="155" rx="5" ry="90" stroke="gray" fill="none" transform="rotate(30 340 155)"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:h="http://www.w3.org/1999/xhtml"
+     width="200" height="200">
+  <polyline fill="none" stroke="blue" stroke-width="5"
+            points="20,30 50,70" id="stripe">
+    <set id="anim" attributeType="XML" attributeName="points" fill="freeze"
+         to="170,150 130,120" begin="indefinite" onbegin="measure()"/>
+  </polyline>
+</svg>

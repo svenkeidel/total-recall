@@ -1,0 +1,8 @@
+<svg>
+  <linearGradient id="lg" style="color: green">
+    <stop stop-color="red">
+      <animate attributeName="stop-color" from="currentcolor" to="green" dur="10s" fill="freeze"/>
+    </stop>
+  </linearGradient>
+  <rect width="100" height="100" fill="url(#lg)"/>
+</svg>

@@ -1,0 +1,13 @@
+  <svg viewBox="0 0 480 360">
+    <g>
+      <defs>
+        <path id="Red100" d="M 0 0 L 0 150 L 150 0 z"></path>
+        <filter id="xor" x="0" y="0" width="1" height="1">
+          <feImage href="#Red100" result="red"></feImage>
+        </filter>
+      </defs>
+      <g>
+        <rect x="0" y="0" width="150" height="150" filter="url(#xor)"></rect>
+      </g>
+    </g>
+  </svg>

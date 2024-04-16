@@ -1,0 +1,7 @@
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(0), (2);
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+0 200
+  UPDATE t1 SET x=NULL WHERE x=2;
+0000

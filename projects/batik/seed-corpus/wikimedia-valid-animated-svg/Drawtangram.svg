@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.1" baseProfile="tiny" width="57.22mm" height="57.22mm" viewBox="0 0 5722 5722" preserveAspectRatio="xMidYMid" fill-rule="evenodd" clip-path="url(#presentation_clip_path)" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <defs class="ClipPathGroup">
+  <clipPath id="presentation_clip_path" clipPathUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="5722" height="5722"/>
+  </clipPath>
+ </defs>
+ <defs class="TextShapeIndex">
+  
+ </defs>
+ <defs class="TextEmbeddedBitmaps"/>
+ <g>
+  <g id="id2" class="Master_Slide">
+   <g id="bg-id2" class="Background"/>
+   <g id="bo-id2" class="BackgroundObjects"/>
+  </g>
+ </g>
+ <g class="SlideGroup">
+  <g>
+   <g id="id1" class="Slide" clip-path="url(#presentation_clip_path)">
+    <g class="Page">
+     <g class="Group">
+      <g class="com.sun.star.drawing.PolyLineShape">
+       <g id="id3" opacity="0"><animate id="first" attributeName="opacity" from="100" to="100" begin="0ms;last.end+0ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="100" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 41,5684 L 5684,5686"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 37,4271 L 5682,4271"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,2860 L 5682,2860"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 39,1449 L 5682,1449"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 38,38 L 5682,38"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 38,5682 L 38,38"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 1449,5682 L 1449,37"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 2862,5682 L 2860,38"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 4271,5682 L 4273,37"/>
+        <path fill="none" stroke="rgb(192,192,192)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 5682,5682 L 5682,38"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.LineShape">
+       <g id="id4" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+1000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,40 L 5684,5684"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.LineShape">
+       <g id="id5" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+2000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 2864,40 L 5684,2862"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.LineShape">
+       <g id="id6" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+3000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 1451,1451 L 2862,40"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.LineShape">
+       <g id="id7" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+4000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,5684 L 4273,1451"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.LineShape">
+       <g id="id8" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+5000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 4273,1451 L 4275,4273"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id9" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(255,0,0)" stroke="none" d="M 40,5684 L 40,40 2862,2862 40,5684 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,5684 L 40,40 2862,2862 40,5684 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id10" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(0,0,255)" stroke="none" d="M 40,5684 L 5684,5684 2862,2862 40,5684 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,5684 L 5684,5684 2862,2862 40,5684 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id11" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(0,128,0)" stroke="none" d="M 40,40 L 2862,40 1451,1451 40,40 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 40,40 L 2862,40 1451,1451 40,40 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id12" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(128,0,128)" stroke="none" d="M 2862,40 L 5684,40 5686,2862 2862,40 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 2862,40 L 5684,40 5686,2862 2862,40 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id13" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(0,255,0)" stroke="none" d="M 4273,4273 L 2862,2862 4273,1451 4273,4273 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 4273,4273 L 2862,2862 4273,1451 4273,4273 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id14" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="1ms" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(255,0,255)" stroke="none" d="M 2862,40 L 1451,1451 2862,2862 4273,1451 2862,40 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 2862,40 L 1451,1451 2862,2862 4273,1451 2862,40 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id15" opacity="0"><animate  attributeName="opacity" from="100" to="100" begin="first.end+6000ms" dur="2001ms" id="last" fill="freeze"/><animate attributeName="opacity" from="100" to="0" begin="last.end" dur="1ms" fill="freeze"/>
+        <path fill="rgb(255,255,0)" stroke="none" d="M 4273,4271 L 4273,1451 5684,2860 5684,5683 4273,4271 Z"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" stroke-linejoin="round" stroke-linecap="round" d="M 4273,4271 L 4273,1451 5684,2860 5684,5683 4273,4271 Z"/>
+       </g>
+      </g>
+     </g>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

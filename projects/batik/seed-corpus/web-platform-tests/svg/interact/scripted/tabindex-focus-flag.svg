@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:h="http://www.w3.org/1999/xhtml">
+    <metadata>
+        <h:link rel="help" href="https://svgwg.org/svg2-draft/interact.html#Focus"/>
+    </metadata>
+    <g id="default-samples">
+        <!-- non-default focusable renderable element -->
+        <rect></rect>
+        <svg></svg>
+        <!-- for compatibility with SVG Tiny 1.2 focusable attribute, user agents should treat an element with a value of true for that attribute as focusable -->
+        <rect focusable="true"></rect>
+        <!-- anchors need a href to be focusable -->
+        <a></a>
+        <a href=""></a>
+        <!-- Remove default focus behaviour with focusable="false" (SVG Tiny 1.2 compatibility) -->
+        <a href="" focusable="false"></a>
+        <!-- iframe, and audio/video with controls are default focusable -->
+        <h:iframe src="resources/blank.htm"></h:iframe>
+        <h:audio controls="controls"></h:audio>
+        <h:video controls="controls"></h:video>
+        <!-- non-default focusable renderable element with valid tabindex -->
+        <h:canvas tabindex="0"></h:canvas>
+        <circle tabindex="0"></circle>
+        <ellipse tabindex="0"></ellipse>
+        <foreignObject tabindex="0"></foreignObject>
+        <g tabindex="0"></g>
+        <image tabindex="0"></image>
+        <line tabindex="0"></line>
+        <mesh tabindex="0"></mesh>
+        <path tabindex="0"></path>
+        <polygon tabindex="0"></polygon>
+        <rect tabindex="0"></rect>
+        <svg tabindex="0"></svg>

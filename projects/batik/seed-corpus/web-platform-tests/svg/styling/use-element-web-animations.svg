@@ -1,0 +1,6 @@
+<svg>
+  <use id="use_elm" xlink:href="#tmpl" />
+  <g id="g_elm">
+    <text id="tmpl" x="10" y="100">Hello!</text>
+  </g>
+</svg>

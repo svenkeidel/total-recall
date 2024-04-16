@@ -1,0 +1,3 @@
+SELECT POSITION ( 'foo' IN 'bar' );
+SELECT POSITION ( 'foo' IN 'bar' USING CHARACTERS );
+SELECT POSITION ( 'foo' IN 'bar' USING OCTETS );

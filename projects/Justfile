@@ -1,0 +1,315 @@
+set dotenv-load := true
+set shell := ["bash", "-uc"]
+
+export DOCKER_BUILDKIT := "1"
+
+export BASE_DIR := absolute_path("../")
+
+PROJECT := env_var("PROJECT")
+
+export PROJECT_PATH := absolute_path(PROJECT)
+export TARGET_PATH := PROJECT_PATH / "target"
+
+FUZZER := capitalize(PROJECT) + "Fuzzer"
+CUSTOM_MUTATOR := env_var_or_default("CUSTOM_MUTATOR", "")
+FUZZING_THREADS := "8"
+FUZZING_TIME := "3600"
+
+DYNCG_TIMEOUT := "999m"
+DYNCG_MEMORY := "400G"
+
+STATICCG_TIMEOUT := "180m"
+STATICCG_MEMORY := "400G"
+
+COMPARECG_TIMEOUT := "999m"
+COMPARECG_MEMORY := "28G"
+
+FUZZING_IMAGE := "jazzer"
+JCG_IMAGE := "jcg"
+
+FUZZING_CONTAINER := "fuzz-" + PROJECT
+COVERAGE_CONTAINER := "coverage-" + PROJECT
+DYNCG_CONTAINER := "dyncg-" + PROJECT
+STATICCG_CONTAINER := "staticcg-" + PROJECT
+COMPARECG_CONTAINER := "comparecg-" + PROJECT
+
+JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
+JACOCO := BASE_DIR / "lib/jacoco"
+
+UID := `id -u`
+GID := `id -g`
+
+DISABLED_HOOKS:= "\
+com.code_intelligence.jazzer.sanitizers.ReflectiveCall:\
+com.code_intelligence.jazzer.sanitizers.SqlInjection:\
+com.code_intelligence.jazzer.sanitizers.ServerSideRequestForgery"
+
+[private]
+build_xcorpus_image:
+    docker build --tag=xcorpus -f {{BASE_DIR}}/java-corpora/xcorpus/xcorpus.Dockerfile {{BASE_DIR}}/java-corpora/xcorpus
+
+[private]
+build_jazzer_input_parser:
+    docker build --tag=jazzer-input-parser {{BASE_DIR}}/jazzer_input_parser
+
+[private]
+build_jazzer_image:
+    docker build \
+      --tag={{FUZZING_IMAGE}} \
+      --build-arg UID={{UID}} \
+      --build-arg GID={{GID}} \
+      {{BASE_DIR}}/jazzer
+
+[private]
+build_jcg_image:
+    docker build \
+      --tag {{JCG_IMAGE}} \
+      --build-arg UID={{UID}} \
+      --build-arg GID={{GID}} \
+      {{BASE_DIR}}/jcg
+
+build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
+    mkdir -p {{TARGET_PATH}}
+    cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
+
+    docker build \
+      --tag=$PROJECT \
+      --build-arg PROJECT=$PROJECT \
+      --build-arg XCORPUS_PROJECT_PATH=$XCORPUS_PROJECT_PATH \
+      --output {{TARGET_PATH}} \
+      -f {{BASE_DIR}}/java-corpora/xcorpus/build.Dockerfile \
+      {{PROJECT_PATH}}
+
+    rm {{TARGET_PATH}}/jazzer-api.jar
+
+fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
+    # Ensure directories exist
+    mkdir -p {{PROJECT_PATH}}/resources \
+             {{TARGET_PATH}}/{{EXPERIMENT}}/corpus \
+             {{TARGET_PATH}}/{{EXPERIMENT}}/fuzzing_coverage
+    touch {{TARGET_PATH}}/{{EXPERIMENT}}/sync_file \
+          {{TARGET_PATH}}/{{EXPERIMENT}}/fuzzing_coverage/coverage.exec
+
+    # Run fuzzer
+    docker rm -f {{FUZZING_CONTAINER}}
+    docker run -it \
+           --name {{FUZZING_CONTAINER}} \
+           --mount type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
+           --mount type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
+           --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/fuzzing/corpus \
+           --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/fuzzing_coverage/coverage.exec,target=/fuzzing/coverage.exec \
+           --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/sync_file,target=/fuzzing/sync_file \
+           --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt,target=/fuzzing/dict.txt,readonly \
+           {{FUZZING_IMAGE}} \
+           --cp=$(find {{TARGET_PATH}}/repo -name '*.jar' -type f -printf '/repo/%f '  | xargs echo | tr ' ' ':') \
+           --target_class={{FUZZER}} \
+           --instrumentation_includes=$INSTRUMENT_CLASSES \
+           --disabled_hooks={{DISABLED_HOOKS}} \
+           --id_sync_file=/fuzzing/sync_file \
+           -max_total_time={{FUZZING_TIME}} \
+           -fork={{FUZZING_THREADS}} \
+           -max_len=100000 \
+           -timeout=60 \
+           -dict=dict.txt \
+           corpus
+
+[private]
+coverage EXPERIMENT: build_jazzer_image build_project && (coverage_report EXPERIMENT "coverage" "false")
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/coverage {{PROJECT_PATH}}/resources
+    touch {{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec
+
+    # record coverage
+    docker rm -f {{COVERAGE_CONTAINER}}
+    docker run -it \
+               --name {{COVERAGE_CONTAINER}} \
+               --mount type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
+               --mount type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
+               --mount type=bind,source={{JACOCO}}/jacocoagent.jar,target=/jacocoagent.jar,readonly \
+               --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
+               --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec,target=/coverage/coverage.exec \
+               --entrypoint /usr/bin/java \
+               {{FUZZING_IMAGE}} \
+               -cp '/repo/*' \
+               -Djava.library.path=/repo/ \
+               -javaagent:/jacocoagent.jar=destfile=/coverage/coverage.exec,includes=$COVERAGE_INCLUDES \
+               Entrypoint \
+               /corpus
+
+[private]
+coverage_report EXPERIMENT COVERAGE_DIR EXCLUDE_CLASSES:
+    cp -r {{PROJECT_PATH}}/classes {{TARGET_PATH}}
+    if {{EXCLUDE_CLASSES}} && [ ! -z $COVERAGE_EXCLUDES ]; \
+    then \
+      readarray -t EXCLUDES <<< "$COVERAGE_EXCLUDES" && \
+      for (( n=0; n < ${#EXCLUDES[*]}; n++)) do \
+        rm "{{PROJECT_PATH}}/target/classes/${EXCLUDES[n]//\./\/}.class"; \
+      done; \
+    fi
+
+    # generate report
+    rm -rf {{TARGET_PATH}}/{{EXPERIMENT}}/{{COVERAGE_DIR}}/html
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/{{COVERAGE_DIR}}/html
+    java -jar {{JACOCO}}/jacococli.jar \
+      report {{TARGET_PATH}}/{{EXPERIMENT}}/{{COVERAGE_DIR}}/coverage.exec \
+      --classfiles {{TARGET_PATH}}/classes \
+      --html {{TARGET_PATH}}/{{EXPERIMENT}}/{{COVERAGE_DIR}}/html
+
+    rm -rf {{TARGET_PATH}}/classes
+
+[private]
+prepare_base_corpus EXPERIMENT:
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    {{PROJECT_PATH}}/prepare_base_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+
+[private]
+prepare_seed_corpus EXPERIMENT: (prepare_base_corpus EXPERIMENT)
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    {{PROJECT_PATH}}/prepare_seed_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+
+[private]
+prepare_dictionary EXPERIMENT:
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}
+    {{PROJECT_PATH}}/prepare_dictionary.sh {{TARGET_PATH}}/{{EXPERIMENT}}
+
+# Record coverage of base seed corpus only, no manual extensions
+coverage_base_seed: (prepare_base_corpus "base_seed") (coverage "base_seed")
+
+# Record coverage of seed corpus
+coverage_seed: (prepare_seed_corpus "seed") (coverage "seed")
+
+# Record coverage after fuzzing without seed corpus, but dictionary
+coverage_fuzzing: (fuzz "fuzzing") (coverage "fuzzing")
+
+# Record coverage after fuzzing with seed corpus and dictionary
+coverage_fuzzing_seed: (prepare_seed_corpus "fuzzing_seed") (fuzz "fuzzing_seed") (coverage "fuzzing_seed")
+
+[private]
+dynamic_callgraph EXPERIMENT: build_project build_jcg_image
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg {{PROJECT_PATH}}/resources/
+    touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/log.txt
+    docker rm -f {{DYNCG_CONTAINER}}
+    docker run -it \
+      --name {{DYNCG_CONTAINER}} \
+      --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg,target=/dyncg \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/log.txt,target=/log.txt \
+      {{JCG_IMAGE}} \
+      {{DYNCG_TIMEOUT}} \
+      {{DYNCG_MEMORY}} \
+      runMain Evaluation \
+      --input /jcg-conf/ \
+      --output /dyncg \
+      --program-args /corpus \
+      --adapter Dynamic \
+      --algorithm-prefix Dynamic \
+      --project-prefix $PROJECT \
+      --zip \
+      --debug
+
+dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
+
+compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
+    mkdir -p {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}} 
+    touch {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-all.txt
+    touch {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-package.txt
+    docker rm -f {{COMPARECG_CONTAINER}}
+    docker run -it \
+      --name {{COMPARECG_CONTAINER}} \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/$PROJECT/Dynamic/Dynamic,target=/dynamiccg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}},target=/staticcg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-all.txt,target=/log.txt \
+      {{JCG_IMAGE}} \
+      {{COMPARECG_TIMEOUT}} \
+      {{COMPARECG_MEMORY}} \
+      runMain CompareCGs \
+      --input1 /dynamiccg/cg.zip \
+      --input2 /staticcg/cg.zip \
+      --showPrecisionRecall all \
+      --nonStrict
+    docker rm -f {{COMPARECG_CONTAINER}}
+    docker run -it \
+      --name {{COMPARECG_CONTAINER}} \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/$PROJECT/Dynamic/Dynamic,target=/dynamiccg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}},target=/staticcg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-package.txt,target=/log.txt \
+      {{JCG_IMAGE}} \
+      {{COMPARECG_TIMEOUT}} \
+      {{COMPARECG_MEMORY}} \
+      runMain CompareCGs \
+      --input1 /dynamiccg/cg.zip \
+      --input2 /staticcg/cg.zip \
+      --showPrecisionRecall all \
+      --nonStrict \
+      --inPackage L$COMPARE_PACKAGE
+
+
+[private]
+compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph "fuzzing_seed" "OPAL" "RTA") (compare_callgraph "fuzzing_seed" "OPAL" "0-CFA")
+[private]
+compare_wala: (compare_callgraph "fuzzing_seed" "WALA" "CHA") (compare_callgraph "fuzzing_seed" "WALA" "RTA") (compare_callgraph "fuzzing_seed" "WALA" "0-CFA")
+[private]
+compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA")
+[private]
+compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "context-insensitive")
+
+compare_callgraphs: compare_opal compare_wala compare_soot compare_doop
+
+static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
+    mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
+    touch {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/log.txt
+    docker rm -f {{STATICCG_CONTAINER}}
+    docker run -it \
+      --name {{STATICCG_CONTAINER}} \
+      --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg,target=/staticcg \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/log.txt,target=/log.txt \
+      {{JCG_IMAGE}} \
+      {{STATICCG_TIMEOUT}} \
+      {{STATICCG_MEMORY}} \
+      runMain Evaluation \
+      --input /jcg-conf/ \
+      --output /staticcg \
+      --adapter {{FRAMEWORK}} \
+      --algorithm-prefix {{ALGO}} \
+      --project-prefix $PROJECT \
+      --zip \
+      --debug
+
+[private]
+opal_callgraphs: (static_callgraph "OPAL" "CHA") (static_callgraph "OPAL" "RTA") (static_callgraph "OPAL" "0-CFA")
+[private]
+wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA")
+[private]
+soot_callgraphs: (static_callgraph "Soot" "CHA")
+[private]
+doop_callgraphs: (static_callgraph "Doop" "context-insensitive")
+
+static_callgraphs: opal_callgraphs wala_callgraphs soot_callgraphs doop_callgraphs
+
+[private]
+clean_experiment EXPERIMENT:
+    rm -rf {{TARGET_PATH}}/{{EXPERIMENT}}
+
+[private]
+clean_all_experiments: (clean_experiment "seed") (clean_experiment "fuzzing") (clean_experiment "fuzzing_seed")
+
+[private]
+clean_dyncg:
+    rm -rf {{TARGET_PATH}}/dyncg
+
+[private]
+clean_staticcg:
+    rm -rf {{TARGET_PATH}}/staticcg
+
+[private]
+clean_project_build:
+    rm -rf {{TARGET_PATH}}/repo
+
+clean: clean_all_experiments clean_dyncg clean_staticcg
+
+default: coverage_seed coverage_fuzzing coverage_fuzzing_seed

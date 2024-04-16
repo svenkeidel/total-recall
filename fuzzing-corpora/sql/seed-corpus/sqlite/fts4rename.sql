@@ -1,0 +1,4 @@
+
+  CREATE VIRTUAL TABLE temp.t1 USING fts3(a);
+  BEGIN;
+  CREATE TABLE t2(x);

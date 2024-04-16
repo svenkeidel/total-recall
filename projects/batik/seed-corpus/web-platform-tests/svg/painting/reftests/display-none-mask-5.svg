@@ -1,0 +1,7 @@
+  <svg width="200" height="200" style="display:none">
+    <defs>
+      <mask id="noneMask">
+        <rect x="0" y="0" width="200" height="200" fill="#4d4d4d"></rect>
+      </mask>
+    </defs>
+  </svg>

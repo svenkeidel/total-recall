@@ -1,0 +1,1 @@
+PRAGMA integrity_check PRAGMA freelist_count    SELECT count(*) FROM t1 

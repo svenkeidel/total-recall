@@ -1,0 +1,4 @@
+  <svg width="300" height="300" viewBox="0 0 300 300"
+       xmlns:xlink="http://www.w3.org/1999/xlink">
+    <use xlink:href="#refRect"/>
+  </svg>

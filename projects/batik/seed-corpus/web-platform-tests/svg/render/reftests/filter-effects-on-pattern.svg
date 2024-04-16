@@ -1,0 +1,8 @@
+<svg style="width: 200px; height: 200px; background: green;">
+  <defs>
+    <pattern id="pattern" x="0" y="0" width=".25" height=".25" style="mix-blend-mode: difference;">
+      <rect x="0" y="0" width="25" height="25" fill="green"/>
+    </pattern>
+  </defs>
+  <rect fill="url(#pattern)" width="200" height="200"/>
+</svg>

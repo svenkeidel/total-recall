@@ -1,0 +1,17 @@
+JarIndex-Version: 1.0
+
+axion-1.0-M2-dev.jar
+org/axiondb/util
+org/axiondb/engine/commands
+org/axiondb/engine/rowiterators
+org/axiondb/functions
+org/axiondb
+org/axiondb/parser
+org/axiondb/tools
+org/axiondb/expression
+org/axiondb/engine
+org/axiondb/constraints
+org/axiondb/jdbc
+org/axiondb/types
+org
+org/axiondb/event

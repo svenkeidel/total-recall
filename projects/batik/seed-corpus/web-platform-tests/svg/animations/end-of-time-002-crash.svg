@@ -1,0 +1,6 @@
+<svg>
+  <rect height="100" width="100" fill="blue">
+    <animateTransform begin="18446744073709551557" dur="2" repeatCount="indefinite"
+                      attributeName="transform" type="rotate" from="0,15,15" to="360,15,15"/>
+  </rect>
+</svg>

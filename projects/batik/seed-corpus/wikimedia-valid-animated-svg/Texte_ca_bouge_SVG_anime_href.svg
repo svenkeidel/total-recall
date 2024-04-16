@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="320px" height="200px" version="1.1"
+     viewBox="0 0 320 200"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <title> Ça bouge ! </title>
+  <desc> Texte se modifiant de plusieurs manières </desc>
+
+  <defs>
+    <style type="text/css"><![CDATA[
+      text {
+        font-family: "Liberation Serif", "Times New Roman", serif;
+        font-size: 20
+      }
+    ]]></style>
+  </defs>
+
+  <text id="texteTranslate"
+    x="0" y="15">
+    Ça bouge !
+  </text>
+
+  <text id="texteCouleur"
+    x="0" y="35">
+    Ça bouge !
+  </text>
+
+  <text id="texteCorps"
+    x="0" y="55">
+    Ça bouge !
+  </text>
+
+  <g transform="translate(120, 35)">
+    <text id="texteTourne"
+      x="0" y="0" text-anchor="middle">
+      Ça bouge !
+    </text>
+  </g>
+
+  <animate xlink:href="#texteTranslate"
+    attributeName="x"
+    begin="0s" dur="5s"
+    fill="freeze"
+    from="200" to="0"
+  />
+
+  <animate xlink:href="#texteCouleur"
+    attributeName="fill"
+    begin="0s" dur="5s"
+    fill="freeze"
+    from="#0000ff" to="#ff0000"
+  />
+
+  <animate xlink:href="#texteCorps"
+    attributeName="font-size"
+    begin="0s" dur="5s"
+    fill="freeze"
+    from="1" to="16"
+  />
+
+  <animateTransform xlink:href="#texteTourne"
+    attributeName="transform"
+    type="rotate"
+    begin="0s" dur="5s"
+    fill="freeze"
+    from="0" to="360"
+  />
+
+</svg>

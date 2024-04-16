@@ -1,0 +1,3 @@
+  <svg id="mySVG" style="height: 200px; width: 200px;">
+    <rect width="200" height="200" fill="lime"></rect>
+  </svg>

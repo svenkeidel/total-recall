@@ -1,0 +1,11 @@
+<svg>
+  <foreignobject width="100" height="100" style="background:red;">
+    <div style="margin:100px 0;">
+      <div style="margin:100px 0;"></div>
+    </div>
+    <div style="margin:100px 0;">
+      <div style="margin:100px 0;"></div>
+    </div>
+    <div style="margin-top:-100px; height:100px; background:green;"></div>
+  </foreignobject>
+</svg>

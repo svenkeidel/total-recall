@@ -1,0 +1,6 @@
+<svg>
+  <rect width="100" height="100" fill="green">
+    <set attributeName="fill" to="red"
+         begin="9223372036854775807" dur="10ms"/>
+  </rect>
+</svg>

@@ -1,0 +1,11 @@
+<svg>
+  <g font-size="50" text-rendering="geometricPrecision">
+    <text y="50">👦</text>
+    <text y="100">👨‍👩‍👧‍👦</text>
+    <text y="50" x="100">👨‍</text>
+    <text y="100" x="100">👩🏽‍🌾</text>
+    <text y="50" x="150">👨‍👦</text>
+    <text y="100" x="150">👱🏽‍♂️</text>
+    <text y="50" x="200">🎅🏽</text>
+  </g>
+</svg>

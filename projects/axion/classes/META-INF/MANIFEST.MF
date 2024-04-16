@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Created-By: Apache Jakarta Maven
+Built-By: jamesstrachan
+Package: org.axiondb
+Build-Jdk: 1.3.1
+Extension-Name: axion
+Specification-Version: 
+Specification-Vendor: Axion Development Team
+Specification-Title: Axion Database Engine
+Implementation-Version: 1.0-M2-dev
+Implementation-Vendor: Axion Development Team
+Implementation-Vendor-Id: 
+

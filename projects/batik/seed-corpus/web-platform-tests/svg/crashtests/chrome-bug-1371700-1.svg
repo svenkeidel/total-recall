@@ -1,0 +1,5 @@
+<svg id="svgvar00001">
+  <clipPath>
+    <image xlink:href="#nothing" onerror="foo()"/>
+  </clipPath>
+</svg>

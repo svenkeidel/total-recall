@@ -1,0 +1,6 @@
+<svg>
+  <rect width="100" height="100" fill="green">
+    <animate attributeName="fill" values="red;red" begin="-1s" dur="1s" fill="freeze"/>
+  </rect>
+  <set attributeName="stroke-width" to="10"/>
+</svg>

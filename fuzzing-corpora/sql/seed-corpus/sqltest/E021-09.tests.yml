@@ -1,0 +1,9 @@
+SELECT TRIM ( 'foo' );
+SELECT TRIM ( 'foo' FROM 'foo' );
+SELECT TRIM ( BOTH 'foo' FROM 'foo' );
+SELECT TRIM ( BOTH FROM 'foo' );
+SELECT TRIM ( FROM 'foo' );
+SELECT TRIM ( LEADING 'foo' FROM 'foo' );
+SELECT TRIM ( LEADING FROM 'foo' );
+SELECT TRIM ( TRAILING 'foo' FROM 'foo' );
+SELECT TRIM ( TRAILING FROM 'foo' );
