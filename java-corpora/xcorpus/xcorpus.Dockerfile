@@ -28,34 +28,6 @@ RUN --mount=type=bind,source=batik/,target=/xcorpus-src/data/qualitas_corpus_201
       jar -uvfm ${BATIK_PATH}/default-lib/${JAR} ${BATIK_PATH}/patch/${JAR}/META-INF/MANIFEST.MF;  \
     done
 
-#ARG CASTOR_PATH=/xcorpus-src/data/qualitas_corpus_20130901/castor-1.3.1/project
-#RUN mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml:1.3.1 -DoutputDirectory=${CASTOR_PATH}/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml:1.3.1:pom -DoutputDirectory=${CASTOR_PATH}/ && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-xml-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml-schema:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml-schema:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-xml-schema-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml-diff:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-xml-diff:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-xml-diff-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-core:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-core:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-core-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-codegen:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-codegen:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-codegen-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-ddlgen:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-ddlgen:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-ddlgen-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-jdo:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-jdo:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-jdo-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-anttasks:1.3.1 -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy -Dartifact=org.codehaus.castor:castor-anttasks:1.3.1:pom -DoutputDirectory=${CASTOR_PATH} && \
-#    mvn dependency:copy-dependencies -f ${CASTOR_PATH}/castor-anttasks-1.3.1.pom -DoutputDirectory=${CASTOR_PATH}/default-lib/ && \
-#    unzip -q -o "${CASTOR_PATH}/*.jar" -d ${CASTOR_PATH}/jar/ && \
-#    jar cf ${CASTOR_PATH}/bin.zip -C ${CASTOR_PATH}/jar/ . && \
-#    rm -rf ${CASTOR_PATH}/jar/ ${CASTOR_PATH}/*.jar ${CASTOR_PATH}/*.pom
 
 ARG FINDBUGS_PATH=/xcorpus-src/data/qualitas_corpus_20130901/findbugs-1.3.9/project
 RUN wget https://github.com/JavaQualitasCorpus/findbugs-1.3.9/raw/master/findbugs-1.3.9.jar -O${FINDBUGS_PATH}/bin.zip && \
@@ -93,6 +65,13 @@ RUN unzip -q ${XERCES_PATH}/bin.zip -d ${XERCES_PATH}/jar/ && \
     rmdir ${XERCES_PATH}/jar/xercesImpl/ && \
     jar cf ${XERCES_PATH}/bin.zip -C ${XERCES_PATH}/jar/ .
 
+
+ARG JAVACC_PATH=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project
+#download and save it there
+RUN wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/javacc-5.0.jar -O${JAVACC_PATH}/bin.zip && \
+    wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/lib/junit3.8.1/junit.jar -P${JAVACC_PATH}/default-lib/
+
+
 # Ensure project/default-lib directories are present
 RUN find /xcorpus-src/data -name 'project' -type d -exec mkdir -p {}/default-lib \;
 
@@ -105,3 +84,21 @@ RUN cd /xcorpus-src/tools && \
 # RUN rm -rf /xcorpus-src
 
 WORKDIR /xcorpus
+
+
+#ARG JAVACC_PATH=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project
+#RUN wget https://repo1.maven.org/maven2/javacc/javacc/4.0/javacc-4.0.jar -P${JAVACC_PATH}/default-lib/ && \
+#    wget https://repo1.maven.org/maven2/javacc/javacc/4.0/javacc-4.0-sources.jar -P${JAVACC_PATH}/default-lib/ && \
+#    wget https://repo1.maven.org/maven2/javacc/javacc/4.0/javacc-4.0.pom -P${JAVACC_PATH}/default-lib/
+#RUN --mount=type=bind,source=javacc/,target=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project/patch/ \
+#    for JAR in $(ls ${JAVACC_PATH}/patch); \
+#    do \
+#       zip -d ${JAVACC_PATH}/default-lib/${JAR} META-INF/MANIFEST.MF; \
+#       jar -uvfm ${JAVACC_PATH}/default-lib/${JAR} ${JAVACC_PATH}/patch/${JAR}/META-INF/MANIFEST.MF;  \
+#    done
+
+#ARG JAVACC_PATH=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project
+#RUN mvn dependency:copy -Dartifact=javacc:javacc:4.0 -DoutputDirectory=${JAVACC_PATH} && \
+#    mv ${JAVACC_PATH}/javacc-4.0.jar ${JAVACC_PATH}/bin.zip && \
+#    mvn dependency:copy -Dartifact=javacc:javacc:4.0:pom -DoutputDirectory=${JAVACC_PATH} && \
+#    mvn dependency:copy-dependencies -f ${JAVACC_PATH}/javacc-4.0.pom -DoutputDirectory=${JAVACC_PATH}/default-lib/
