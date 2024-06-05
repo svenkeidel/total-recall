@@ -1,8 +1,8 @@
 # JavaCC Keywords and Special Tokens
+"PARSER_BEGIN"
 "options"
 "LOOKAHEAD"
 "IGNORE_CASE"
-"PARSER_BEGIN"
 "PARSER_END"
 "JAVACODE"
 "TOKEN"

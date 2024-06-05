@@ -68,8 +68,9 @@ RUN unzip -q ${XERCES_PATH}/bin.zip -d ${XERCES_PATH}/jar/ && \
 
 ARG JAVACC_PATH=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project
 #download and save it there
-RUN wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/javacc-5.0.jar -O${JAVACC_PATH}/bin.zip && \
-    wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/lib/junit3.8.1/junit.jar -P${JAVACC_PATH}/default-lib/
+RUN  wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/lib/junit3.8.1/junit.jar -P${JAVACC_PATH}/default-lib/ && \
+wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/javacc-5.0.jar -O${JAVACC_PATH}/bin.zip 
+
 
 
 # Ensure project/default-lib directories are present
