@@ -27,7 +27,7 @@ public class Entrypoint {
 
             
             // Call the parser main method
-            org.javacc.parser.Main.main(new String[] {grammarFile.getAbsolutePath()});
+            org.javacc.parser.Main.mainProgram(new String[] {grammarFile.getAbsolutePath()});
         } catch(Throwable t) {
             t.printStackTrace(); 
         }

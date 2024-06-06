@@ -17,7 +17,6 @@ public class JavaccFuzzer {
             String fuzzContent = new String(fuzzData, StandardCharsets.UTF_8);
             System.out.println("Generated fuzzing file content:\n" + fuzzContent);
 
-            // Pass the file to the entrypoint method
             Entrypoint.entrypoint(temp.toFile());
         } finally {
             Files.delete(temp);
