@@ -25,8 +25,6 @@ public class Entrypoint {
             System.out.println("**************************************File content:\n" + content);
             System.out.println("**************************************End of file content:\n");
 
-            
-            // Call the parser main method
             org.javacc.parser.Main.mainProgram(new String[] {grammarFile.getAbsolutePath()});
         } catch(Throwable t) {
             t.printStackTrace(); 
