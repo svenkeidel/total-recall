@@ -67,11 +67,25 @@ RUN unzip -q ${XERCES_PATH}/bin.zip -d ${XERCES_PATH}/jar/ && \
 
 
 ARG JAVACC_PATH=/xcorpus-src/data/qualitas_corpus_20130901/javacc-5.0/project
-#download and save it there
-RUN  wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/lib/junit3.8.1/junit.jar -P${JAVACC_PATH}/default-lib/ && \
-wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/javacc-5.0.jar -O${JAVACC_PATH}/bin.zip 
+RUN wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/lib/junit3.8.1/junit.jar \
+    -P${JAVACC_PATH}/default-lib/
+RUN wget https://github.com/JavaQualitasCorpus/javacc-5.0/raw/master/javacc-5.0.jar \ 
+-O${JAVACC_PATH}/bin.zip 
 
 
+ARG HSQL_PATH=/xcorpus-src/data/qualitas_corpus_20130901/hsqldb-2.0.0/project
+RUN mkdir -p ${HSQL_PATH}/default-lib 
+
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/hsqldb-2.0.0.jar -P${HSQL_PATH}/default-lib/
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/lib/com.springsource.org.apache.tools.ant-1.8.1.jar
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/lib/hibernate-3.6.6.jar -P${HSQL_PATH}/default-lib/ 
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/lib/javax.servlet.jar -P${HSQL_PATH}/default-lib/ 
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/lib/servlet-2_3-fcs-classfiles.zip -P${HSQL_PATH}/default-lib/
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/lib/slf4j-api.jar -P${HSQL_PATH}/default-lib/ 
+RUN wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/refs/heads/master/hsqldb-2.0.0.jar -O${HSQL_PATH}/bin.zip
+
+
+        ## wget https://github.com/JavaQualitasCorpus/hsqldb-2.0.0/raw/master/lib/hsqldb.jar -P${HSQL_PATH}/default-lib/ && \
 
 # Ensure project/default-lib directories are present
 RUN find /xcorpus-src/data -name 'project' -type d -exec mkdir -p {}/default-lib \;

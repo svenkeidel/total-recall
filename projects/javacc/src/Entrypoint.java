@@ -2,20 +2,18 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.io.IOException;
-
 import org.javacc.parser.*;
 
 public class Entrypoint {
-
+  /**
+     * 
+     * @param grammarFile The grammar file to be processed.
+     */
     public static void entrypoint(File grammarFile){
         try {
-            System.out.println("showing path *********************************************************");
-            System.out.println("Processing file: " + grammarFile.getAbsolutePath());
-            System.out.println("*****************************************************");
-            
+            System.out.println("Processing file: " + grammarFile.getAbsolutePath());            
             long fileSize = grammarFile.length();
             System.out.println("File size: " + fileSize + " lines");
-    
             if (fileSize == 0) {
                 System.out.println("File is empty, skipping processing.");
                 return;

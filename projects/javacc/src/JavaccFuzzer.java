@@ -1,5 +1,4 @@
 import com.code_intelligence.jazzer.api.FuzzedDataProvider;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
