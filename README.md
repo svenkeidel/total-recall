@@ -82,10 +82,10 @@ We conducted our experiments on a benchmark of four projects (`axion`, `batik`, 
 To execute recipes for a single project of the benchmark, you first need to change into the respective project directory. For example, run `cd ./projects/batik` in the root directory to be able to run recipes for the `batik` project. Each project holds a `.env` file that configures project-specific variables and settings. To load those settings, simply run the following for any given recipe:
 
 ```
-just --dotenv-path .env <recipe_name>
+just --dotenv-filename .env <recipe_name>
 ```
 
-For example, you can run `just --dotenv-path .env clean` to clean all data for the current project. The following recipes are available for individual projects:
+For example, you can run `just --dotenv-filename .env clean` to clean all data for the current project. The following recipes are available for individual projects:
 
 | Recipe       | Requires | Description | Outputs To |
 |--------------|:-----:|-----------|:-----:|
@@ -103,7 +103,7 @@ There are parameters that can be configured to change the default behavior of re
 The most important parameters in our case are:
 - `FUZZING_THREADS := "8"`: Number of threads the fuzzer is executed with. Applies to all Fuzzing-Related Recipes.
 - `FUZZING_TIME := "3600"`: Number of seconds to run the fuzzer. Applies to all Fuzzing-Related Recipes.
-- `DYNCG_TIMEOUT := "999m"`: Timeout for computing the dynamic call graphs. Applies to `dynamic_callgraph_fuzzing_seed`.
+- `DYNCG_TIMEOUT := "999m"`: Timeout for computing the dynamic call graphs. Applies to `dynamic_callgraph_fu[hsqldb](projects/hsqldb)zzing_seed`.
 - `DYNCG_MEMORY := "400G"`: Memory for computing the dynamic call graphs. Applies to `dynamic_callgraph_fuzzing_seed`.
 - `STATICCG_TIMEOUT := "90m"`: Timeout for computing the static call graphs. Applies to `static_callgraphs`.
 - `STATICCG_MEMORY := "400G"`: Memory to computing the static call graphs. Applies to `static_callgraphs`.
@@ -111,10 +111,10 @@ The most important parameters in our case are:
 **To reproduce our core experiments**, one would typically want to build a reasonably large input corpus using the fuzzer, then record the dynamic callgraph, compute all static callgraphs, and finally compute the precision and recall for all static callgraphs given the dynamic one. This would be done by executing the following commands (with 10 minutes of fuzzing):
 
 ```
-just --dotenv-path .env FUZZING_TIME="600" coverage_fuzzing_seed
-just --dotenv-path .env dynamic_callgraph_fuzzing_seed
-just --dotenv-path .env static_callgraphs
-just --dotenv-path .env compare_callgraphs
+just --dotenv-filename .env FUZZING_TIME="600" coverage_fuzzing_seed
+just --dotenv-filename .env dynamic_callgraph_fuzzing_seed
+just --dotenv-filename .env static_callgraphs
+just --dotenv-filename .env compare_callgraphs
 ```
 
 **NOTE:** Some recipes may take a very long time to execute. Especially `static_callgraphs` will require a lot of resources and may take many hours to complete. Recording a dynamic callgraph via `dynamic_callgraph_fuzzing_seed` may also take several hours, or even days, dependending on the resources available and the size of the input corpus.

@@ -16,7 +16,7 @@ for_all_projects RECIPE *ARGS:
     for project in $(ls projects); do \
         just \
           --justfile projects/Justfile \
-          --dotenv-path projects/$project/.env \
+          --dotenv-filename projects/$project/.env \
           FUZZING_TIME={{FUZZING_TIME}} \
           FUZZING_THREADS={{FUZZING_THREADS}} \
           DYNCG_TIMEOUT={{DYNCG_TIMEOUT}} \
