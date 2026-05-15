@@ -257,10 +257,14 @@ compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callg
 [private]
 compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "PTA")
 [private]
+compare_valuecg: (compare_callgraph "fuzzing_seed" "ValueCG" "fast") (compare_callgraph "fuzzing_seed" "ValueCG" "precise")
+[private]
 compare_wala: (compare_callgraph "fuzzing_seed" "WALA" "CHA") (compare_callgraph "fuzzing_seed" "WALA" "RTA") (compare_callgraph "fuzzing_seed" "WALA" "0-CFA") (compare_callgraph "fuzzing_seed" "WALA" "1-CFA") (compare_callgraph "fuzzing_seed" "WALA" "0-1-CFA")
 
-compare_callgraphs: (compare_callgraph "fuzzing_seed" "OPAL" "RTA")
-# compare_doop compare_opal compare_soot compare_sootup compare_taie compare_wala
+compare_callgraphs: compare_doop compare_opal compare_soot compare_sootup compare_taie compare_wala
+
+VALUECG_DIR := "/home/JCG/valuecg"
+VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
     mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
@@ -268,6 +272,10 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
     docker rm -f {{STATICCG_CONTAINER}}
     docker run -it \
       --name {{STATICCG_CONTAINER}} \
+      --env VALUECG_RUNNER_DIR={{VALUECG_DIR}} \
+      --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg_conf,target={{VALUECG_CONFIG_DIR}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
@@ -296,9 +304,11 @@ sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" 
 [private]
 taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]
+valuecg_callgraphs: (static_callgraph "ValueCG" "fast") (static_callgraph "ValueCG" "precise")
+[private]
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
-static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
+static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs valuecg_callgraphs wala_callgraphs
 
 [private]
 clean_experiment EXPERIMENT:

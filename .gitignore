@@ -1,3 +1,5 @@
 coverage.exec
 coverage.txt
 **/target/
+jcg/valuecg
+jcg/valuecg_conf

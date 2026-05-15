@@ -44,6 +44,7 @@ The pipeline evaluates the following fixed set of static callgraphs:
 * **Soot**: CHA, RTA, VTA, SPARK
 * **SootUp**: CHA, RTA, 0-CFA, 1-CFA
 * **Tai-E**: CHA, PTA
+* **ValueCG**: fast, precise
 * **WALA**: CHA, RTA, 0-CFA, 1-CFA, 0-1-CFA
 
 Numerical values for precision and recall are computed for every static callgraph and every project. We further include scripts that visualize those values for our set of four programs.
