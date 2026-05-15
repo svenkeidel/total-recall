@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="entrypoint">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/axion/target/repo/entrypoint.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
