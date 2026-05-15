@@ -61,33 +61,33 @@ RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /e
     sudo apt-get install sbt
 
 
-## install OPAL
-#ARG OPAL_BRANCH="update-eclipse-ecj-version"
-#ARG OPAL_COMMIT_ID="a43b9de23adf1bfc7aee122262fdbcbee6c8503a"
-#ARG OPAL_DIR="/home/$USER/OPAL"
-#RUN git clone https://github.com/stg-tud/opal.git ${OPAL_DIR} && \
-#    cd ${OPAL_DIR} && \
-#    git checkout ${OPAL_BRANCH} && \
-#    git reset --hard ${OPAL_COMMIT_ID} && \
-#    sbt publishLocal
+## install OPAL (12.5.2026)
+ARG OPAL_BRANCH="fix/scala-reflect-issue-with-github-pureconfig"
+ARG OPAL_REVISION="4607733afde7bc70f25ce746e19f6e24a0ef8b31"
+ARG OPAL_DIR="/home/$USER/OPAL"
+RUN git clone --branch ${OPAL_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/stg-tud/opal.git ${OPAL_DIR} && \
+    cd ${OPAL_DIR} && \
+    git checkout ${OPAL_BRANCH} && \
+    git reset --hard ${OPAL_REVISION} && \
+    sbt publishLocal
 
 ## INSTALL SOUFFLE (04.05.2026)
 ARG SOUFFLE_CC="gcc"
 ARG SOUFFLE_CXX="g++"
 ARG SOUFFLE_CONFIGURE_OPTIONS=""
 ARG SOUFFLE_GITHUB_USER="souffle-lang"
-ARG SOUFFLE_GIT_BRANCH="master"
-ARG SOUFFLE_GIT_REVISION="c3861e0d3b82dcbcfce14a7bc8f434e70868bef9"
+ARG SOUFFLE_BRANCH="master"
+ARG SOUFFLE_REVISION="c3861e0d3b82dcbcfce14a7bc8f434e70868bef9"
 ARG SOUFFLE_MAKE_JOBS="2"
 ARG SOUFFLE_DIR="/home/$USER/souffle"
 
 ENV CC="${SOUFFLE_CC}"
 ENV CXX="${SOUFFLE_CXX}"
 
-RUN git clone https://github.com/${SOUFFLE_GITHUB_USER}/souffle $SOUFFLE_DIR && \
+RUN git clone --branch ${SOUFFLE_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/${SOUFFLE_GITHUB_USER}/souffle  $SOUFFLE_DIR && \
     cd $SOUFFLE_DIR && \
-    git checkout ${SOUFFLE_GIT_BRANCH} && \
-    git reset --hard ${SOUFFLE_GIT_REVISION} && \
+    git checkout ${SOUFFLE_BRANCH} && \
+    git reset --hard ${SOUFFLE_REVISION} && \
     git clean -xdf && \
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSOUFFLE_DOMAIN_64BIT=ON -DCMAKE_INSTALL_PREFIX=${SOUFFLE_DIR} && \
     cmake --build build -j8 --target install
@@ -97,34 +97,26 @@ RUN sudo ln -s ${SOUFFLE_DIR}/bin/souffle /usr/bin/souffle && \
     souffle -h
 
 ## INSTALL DOOP (23.04.2026)
-ARG DOOP_COMMIT_ID="98f9ead0e96e41dc2a622c82a6d0e158e6631419"
+ARG DOOP_REVISION="98f9ead0e96e41dc2a622c82a6d0e158e6631419"
 ARG DOOP_BRANCH="master"
 ARG DOOP_DIR="/home/$USER/doop"
-ENV DOOP_HOME="$DOOP_DIR"
-RUN git clone https://github.com/plast-lab/doop $DOOP_DIR && \
+ENV DOOP_HOME="$DOOP_DIR/build/install/doop/"
+RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-01"  https://github.com/plast-lab/doop $DOOP_DIR && \
     cd $DOOP_DIR && \
     git checkout ${DOOP_BRANCH} && \
-    git reset --hard ${DOOP_COMMIT_ID} && \
-    ./doop -h
+    git reset --hard ${DOOP_REVISION} && \
+    ./gradlew installDist
 
-## install Coursier (dependency of JCG)
-ARG COURSIER_DIR="/home/$USER/coursier"
-RUN mkdir -p ${COURSIER_DIR} && \
-    cd ${COURSIER_DIR} && \
-    curl -fL https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux.gz | gzip -d > cs && \
-    chmod +x cs && \
-    sudo ln -s ${COURSIER_DIR}/cs /usr/bin/cs && \
-    cs --version
-
-## install JCG (07.05.2026)
+## install JCG (12.05.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_COMMIT_ID="e0ee5e6fe292ce733290fc9b328c729665dcbad5"
+ARG JCG_REVISION="1ac32bb5a7bd24ae3a95e12d5a2d958f7dfc9fce"
 ARG JCG_DIR="/home/$USER/JCG"
-RUN git clone https://github.com/svenkeidel/JCG.git $JCG_DIR && \
+RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \
     git checkout ${JCG_BRANCH} && \
-    git reset --hard ${JCG_COMMIT_ID} && \
-    sbt compile
+    git reset --hard ${JCG_REVISION} && \
+    sbt -java-home /opt/jdk-26+35/ compile && \
+    git clone https://github.com/pascal-lab/java-benchmarks
 
 # Install OpenJDK 8 version 342
 COPY jre.conf $JCG_DIR/jre.conf

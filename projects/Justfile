@@ -72,15 +72,16 @@ build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
     mkdir -p {{TARGET_PATH}}
     cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
 
-    docker build \
+    docker buildx build \
       --tag=$PROJECT \
       --build-arg PROJECT=$PROJECT \
       --build-arg XCORPUS_PROJECT_PATH=$XCORPUS_PROJECT_PATH \
-      --output {{TARGET_PATH}} \
+      --output type=tar,dest={{TARGET_PATH}}/repo.tar \
       -f {{BASE_DIR}}/java-corpora/xcorpus/build.Dockerfile \
       {{PROJECT_PATH}}
 
-    rm {{TARGET_PATH}}/jazzer-api.jar
+    tar xf {{TARGET_PATH}}/repo.tar -C {{TARGET_PATH}}
+    rm {{TARGET_PATH}}/repo.tar {{TARGET_PATH}}/jazzer-api.jar
 
 fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
     # Ensure directories exist
@@ -281,15 +282,19 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --debug
 
 [private]
-opal_callgraphs: (static_callgraph "OPAL" "CHA") (static_callgraph "OPAL" "RTA") (static_callgraph "OPAL" "0-CFA")
-[private]
-wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA")
-[private]
-soot_callgraphs: (static_callgraph "Soot" "CHA")
-[private]
 doop_callgraphs: (static_callgraph "Doop" "context-insensitive")
+[private]
+opal_callgraphs: (static_callgraph "OPAL" "CHA") (static_callgraph "OPAL" "RTA") (static_callgraph "OPAL" "MTA") (static_callgraph "OPAL" "CTA") (static_callgraph "OPAL" "FTA") (static_callgraph "OPAL" "XTA") (static_callgraph "OPAL" "0-CFA") (static_callgraph "OPAL" "0-1-CFA") (static_callgraph "OPAL" "1-0-CFA") (static_callgraph "OPAL" "1-1-CFA")
+[private]
+soot_callgraphs: (static_callgraph "Soot" "CHA") (static_callgraph "Soot" "RTA") (static_callgraph "Soot" "VTA") (static_callgraph "Soot" "SPARK")
+[private]
+sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" "RTA") (static_callgraph "SootUp" "0-CFA") (static_callgraph "SootUp" "1-CFA")
+[private]
+taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
+[private]
+wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
-static_callgraphs: opal_callgraphs wala_callgraphs soot_callgraphs doop_callgraphs
+static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
 
 [private]
 clean_experiment EXPERIMENT:
