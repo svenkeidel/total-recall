@@ -207,7 +207,7 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image
       --adapter Dynamic \
       --algorithm-prefix Dynamic \
       --project-prefix $PROJECT \
-      --zip \
+      --compress \
       --debug
 
 dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
@@ -226,8 +226,8 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
       runMain CompareCGs \
-      --input1 /dynamiccg/cg.zip \
-      --input2 /staticcg/cg.zip \
+      --input1 /dynamiccg/cg.gz \
+      --input2 /staticcg/cg.gz \
       --showPrecisionRecall all \
       --nonStrict
     docker rm -f {{COMPARECG_CONTAINER}}
@@ -240,23 +240,27 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
       runMain CompareCGs \
-      --input1 /dynamiccg/cg.zip \
-      --input2 /staticcg/cg.zip \
+      --input1 /dynamiccg/cg.gz \
+      --input2 /staticcg/cg.gz \
       --showPrecisionRecall all \
       --nonStrict \
       --inPackage L$COMPARE_PACKAGE
 
-
-[private]
-compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph "fuzzing_seed" "OPAL" "RTA") (compare_callgraph "fuzzing_seed" "OPAL" "0-CFA")
-[private]
-compare_wala: (compare_callgraph "fuzzing_seed" "WALA" "CHA") (compare_callgraph "fuzzing_seed" "WALA" "RTA") (compare_callgraph "fuzzing_seed" "WALA" "0-CFA")
-[private]
-compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA")
 [private]
 compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "context-insensitive")
+[private]
+compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph "fuzzing_seed" "OPAL" "RTA") (compare_callgraph "fuzzing_seed" "OPAL" "CTA") (compare_callgraph "fuzzing_seed" "OPAL" "FTA") (compare_callgraph "fuzzing_seed" "OPAL" "XTA") (compare_callgraph "fuzzing_seed" "OPAL" "0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "0-1-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-1-CFA")
+[private]
+compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA") (compare_callgraph "fuzzing_seed" "Soot" "RTA") (compare_callgraph "fuzzing_seed" "Soot" "VTA") (compare_callgraph "fuzzing_seed" "Soot" "SPARK")
+[private]
+compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "RTA") (compare_callgraph "fuzzing_seed" "SootUp" "0-CFA") (compare_callgraph "fuzzing_seed" "SootUp" "1-CFA")
+[private]
+compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "PTA")
+[private]
+compare_wala: (compare_callgraph "fuzzing_seed" "WALA" "CHA") (compare_callgraph "fuzzing_seed" "WALA" "RTA") (compare_callgraph "fuzzing_seed" "WALA" "0-CFA") (compare_callgraph "fuzzing_seed" "WALA" "1-CFA") (compare_callgraph "fuzzing_seed" "WALA" "0-1-CFA")
 
-compare_callgraphs: compare_opal compare_wala compare_soot compare_doop
+compare_callgraphs: (compare_callgraph "fuzzing_seed" "OPAL" "RTA")
+# compare_doop compare_opal compare_soot compare_sootup compare_taie compare_wala
 
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
     mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
@@ -278,7 +282,7 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --adapter {{FRAMEWORK}} \
       --algorithm-prefix {{ALGO}} \
       --project-prefix $PROJECT \
-      --zip \
+      --compress \
       --debug
 
 [private]
@@ -294,7 +298,8 @@ taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
-static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
+static_callgraphs: (static_callgraph "OPAL" "RTA")
+# doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
 
 [private]
 clean_experiment EXPERIMENT:

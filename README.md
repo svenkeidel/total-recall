@@ -39,10 +39,12 @@ To achieve a good quality of the dynamic baseline, the pipeline provides differe
 
 The pipeline evaluates the following fixed set of static callgraphs: 
 
-* **OPAL**: CHA, RTA, 0-CFA
-* **WALA**: CHA, RTA, 0-CFA
-* **Soot**: CHA
 * **Doop**: 0-CFA
+* **OPAL**: CHA, RTA, CTA, FTA, XTA, 0-CFA, 0-1-CFA, 1-0-CFA, 1-1-CFA
+* **Soot**: CHA, RTA, VTA, SPARK
+* **SootUp**: CHA, RTA, 0-CFA, 1-CFA
+* **Tai-E**: CHA, PTA
+* **WALA**: CHA, RTA, 0-CFA, 1-CFA, 0-1-CFA
 
 Numerical values for precision and recall are computed for every static callgraph and every project. We further include scripts that visualize those values for our set of four programs.
 
