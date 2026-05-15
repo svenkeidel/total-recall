@@ -298,8 +298,7 @@ taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
-static_callgraphs: (static_callgraph "OPAL" "RTA")
-# doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
+static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs wala_callgraphs
 
 [private]
 clean_experiment EXPERIMENT:
