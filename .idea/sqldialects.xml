@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/adv-comments.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/comments.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-abortcommits.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-altspace.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-constcols.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-omits.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-prepare.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-rejects.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-roundtrip.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-rpcommit.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-sqlarray.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-trimall.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/dsv-trimming.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/errhandling.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/goodsqlonly.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/lastval.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/logic.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/macro.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/nestingschema.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/noop.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/nq-noarg1.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/nullrep.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/plcontrolflow.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/q-noarg1.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/rawmode.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/sqlarray.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/sqljrt.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/projects/hsqldb/target/fuzzing_seed/corpus/hsqldb/sqltool/sqlpsm.sql" dialect="GenericSQL" />
+  </component>
+</project>

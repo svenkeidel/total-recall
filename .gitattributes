@@ -1,0 +1,2 @@
+fuzzing-corpora/sql/seed-corpus/sqlance-hsqldb-norec/** filter=lfs diff=lfs merge=lfs -text
+fuzzing-corpora/sql/seed-corpus/sqlance-hsqldb-where/** filter=lfs diff=lfs merge=lfs -text

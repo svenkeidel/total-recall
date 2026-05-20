@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="caffeine-2.9.3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/fuzzing-corpora/sql/sqlancer/target/lib/caffeine-2.9.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

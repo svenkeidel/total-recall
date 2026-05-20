@@ -10,5 +10,5 @@ RUN git clone https://github.com/anse1/sqlsmith
 RUN cd sqlsmith && \
     autoreconf -i && \
     ./configure && \
-    make
-=
+    make && \
+    make install

@@ -62,6 +62,8 @@ build_plots: build_plot_image
             {{PLOT_IMAGE}}
     
 
+clean_staticcg: (for_all_projects "clean_staticcg")
+
 clean: (for_all_projects "clean")
 
 default:

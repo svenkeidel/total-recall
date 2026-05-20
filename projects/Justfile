@@ -108,7 +108,6 @@ fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_imag
            --disabled_hooks={{DISABLED_HOOKS}} \
            --id_sync_file=/fuzzing/sync_file \
            -max_total_time={{FUZZING_TIME}} \
-           -fork={{FUZZING_THREADS}} \
            -max_len=100000 \
            -timeout=60 \
            -dict=dict.txt \
@@ -304,7 +303,7 @@ sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" 
 [private]
 taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]
-valuecg_callgraphs: (static_callgraph "ValueCG" "fast") (static_callgraph "ValueCG" "precise")
+valuecg_callgraphs: (static_callgraph "ValueCG" "fast") # (static_callgraph "ValueCG" "precise")
 [private]
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
@@ -317,11 +316,9 @@ clean_experiment EXPERIMENT:
 [private]
 clean_all_experiments: (clean_experiment "seed") (clean_experiment "fuzzing") (clean_experiment "fuzzing_seed")
 
-[private]
 clean_dyncg:
     rm -rf {{TARGET_PATH}}/dyncg
 
-[private]
 clean_staticcg:
     rm -rf {{TARGET_PATH}}/staticcg
 

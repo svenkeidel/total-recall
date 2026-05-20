@@ -1,0 +1,151 @@
+
+-- Schema authorization using a Role.
+-- Test that non-DBA schema owners can CREATE/SELECT/INSERT objects in their
+-- own schema but not in somebody else's schema (assuming explicit object
+-- rights have not been granted, of course).
+/*u0*/connect user sa password "";
+/*u0*/create user blaine password blaine;
+/*u0*/create user debbie password debbie;
+/*u0*/GRANT CHANGE_AUTHORIZATION TO blaine;
+/*u0*/GRANT CHANGE_AUTHORIZATION TO debbie;
+/*u0*/create role r;
+/*u0*/create role s;
+/*u0*/grant s to r;
+/*u0*/create schema aschema authorization s;
+/*u0*/create schema bschema authorization s;
+/*u0*/create table aschema.a1(i int);
+/*u1*/insert into aschema.a1 values(11);
+/*u0*/create table bschema.b1(i int);
+/*u1*/insert into bschema.b1 values (22);
+/*u0*/commit;
+
+-- Test blaine, who will get his authorization via role s via role r.
+/*u0*/connect user blaine password blaine;
+/*u0*/set schema aschema;
+
+/*u0*/set schema bschema;
+
+
+
+/*u0*/connect user sa password "";
+/*u0*/grant r to blaine;
+/*u0*/connect user blaine password blaine;
+/*u0*/set schema aschema;
+/*u0*/create table a2(i int);
+/*u0*/set schema bschema;
+/*u0*/create table b2(i int);
+/*c1*/select * from aschema.a1;
+/*c1*/select * from bschema.b1;
+/*c0*/select * from aschema.a2;
+/*c0*/select * from bschema.b2;
+
+-- Test debbie, who will get her authorization via role r directly.
+/*u0*/connect user debbie password debbie;
+/*u0*/set schema aschema;
+
+/*u0*/set schema bschema;
+
+
+
+/*u0*/connect user sa password "";
+/*u0*/grant s to debbie;
+/*u0*/connect user debbie password debbie;
+/*u0*/set schema aschema;
+/*u0*/create table a3(i int);
+/*u0*/set schema bschema;
+/*u0*/create table b3(i int);
+/*c1*/select * from aschema.a1;
+/*c1*/select * from bschema.b1;
+/*c0*/select * from aschema.a2;
+/*c0*/select * from bschema.b2;
+/*c0*/select * from aschema.a3;
+/*c0*/select * from bschema.b3;
+
+-- Test of same-named-objects in different schemas.  As an Admin.
+/*u0*/connect user sa password "";
+/*u0*/CREATE TABLE bschema.sametname(i int);
+/*u0*/CREATE TABLE aschema.sametname(i int);
+/*u0*/CREATE VIEW bschema.samevname AS SELECT * FROM bschema.sametname;
+/*u0*/CREATE VIEW aschema.samevname AS SELECT * FROM aschema.sametname;
+/*u0*/CREATE SEQUENCE bschema.samesname START WITH 10;
+/*u0*/CREATE SEQUENCE aschema.samesname START WITH 20;
+/*u1*/INSERT INTO bschema.sametname(i) VALUES(1);
+/*u1*/INSERT INTO aschema.sametname(i) VALUES(2);
+/*r1,10*/SELECT i, NEXT VALUE FOR bschema.samesname FROM bschema.sametname;
+/*r2,20*/SELECT i, NEXT VALUE FOR aschema.samesname FROM aschema.sametname;
+/*r1*/SELECT i FROM bschema.samevname;
+/*r2*/SELECT i FROM aschema.samevname;
+
+/*u0*/connect user sa password "";
+/*u0*/create table public.ptable(i int);
+/*u1*/insert into public.ptable values(9);
+/*u0*/CREATE INDEX public.pindex ON public.ptable(i);
+/*u0*/CREATE SEQUENCE public.psequence;
+-- Basic user schema permission capability has been tested well above
+-- Now LIGHTER TESTING FOR REMAINING COMMANDS AND SCHEMA OBJECT TYPES:
+--  (for authorizations via roles).
+-- (purpose to see if the non-Admin, non-right-granted user may do these
+--  things on his objects, but not to other objects).
+--     Commands to test:  ALTER, DELETE, DROP, GRANT, REVOKE, UPDATE
+--     Object types to test:  INDEX, SEQUENCE, VIEW
+/*u0*/connect user blaine password blaine;
+/*u0*/CREATE TABLE bschema.extra(i1 int);
+/*u0*/CREATE TABLE bschema.todrop(i1 int);
+/*u1*/insert into bschema.extra values(8);
+-- First Commands on TABLEs
+
+/*u0*/ALTER TABLE bschema.extra ADD COLUMN i2 int;
+/*c1*/SELECT * FROM bschema.extra;
+
+/*u1*/UPDATE bschema.extra SET i1 = 44;
+
+/*u1*/DELETE FROM bschema.extra;
+
+/*u0*/GRANT SELECT ON bschema.extra TO debbie;
+
+/*u0*/REVOKE SELECT ON bschema.extra FROM debbie RESTRICT;
+
+/*u0*/DROP TABLE bschema.todrop;
+-- Commands on INDEXes
+
+/*u0*/CREATE UNIQUE INDEX bschema.ui1 ON bschema.extra(i1);
+/*c1*/SELECT count(*) FROM bschema.extra;
+
+/*u0*/ALTER INDEX bschema.ui1 RENAME TO othername;
+/*u1*/insert into bschema.extra(i1, i2) values(8,1);
+-- Following violates the UNIQUE index
+
+
+/*u0*/DROP index bschema.othername;
+-- Commands on SEQUENCEs
+
+/*u0*/CREATE SEQUENCE bschema.bseq;
+
+/*c1*/SELECT next value for bschema.bseq FROM bschema.extra;
+
+/*u0*/ALTER SEQUENCE bschema.bseq RESTART WITH 10;
+
+/*u0*/GRANT USAGE ON SEQUENCE bschema.bseq TO debbie;
+
+/*u0*/REVOKE USAGE ON SEQUENCE bschema.bseq FROM debbie RESTRICT;
+
+/*u0*/DROP SEQUENCE bschema.bseq;
+-- Adding views now.  Didn't want them to impact operations on underlying
+-- tables in tests above.
+/*u0*/connect user sa password "";
+/*u0*/create VIEW public.pview AS SELECT * FROM public.ptable;
+/*u0*/connect user blaine password blaine;
+
+/*u0*/create VIEW bschema.bview AS SELECT * FROM bschema.extra;
+
+/*c1*/SELECT * FROM bschema.bview;
+
+/*u0*/GRANT SELECT ON bschema.bview TO debbie;
+
+/*u0*/REVOKE SELECT ON bschema.bview FROM debbie RESTRICT;
+
+/*u0*/DROP VIEW bschema.bview;
+/*u0*/DROP TABLE bschema.extra;
+
+/*u0*/connect user sa password "";
+/*u0*/shutdown;

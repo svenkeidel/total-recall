@@ -1,0 +1,51 @@
+--
+-- TestSelfVerify.txt
+--
+-- This is part of a three part suite of scripts to test persistence in the same DB
+
+-- Correct handling of index creation for foreign keys
+-- check the consistency of foreign keys and primary keys
+
+
+
+
+
+--  fails as a uique indexes on verein and bewerb exist
+
+
+
+-- null value in not null column
+
+-- referential no matching row
+
+-- duplicate row
+
+-- referential integrity row has reference
+
+
+--test identity increment
+INSERT INTO APP2 (VALUE) VALUES(13);
+INSERT INTO APP2 (VALUE) VALUES(14);
+
+/*r5,14*/ SELECT COUNT(ID), MAX(VALUE) FROM APP2
+
+--test persistence of insert into operations
+/*c2*/SELECT * FROM NEWAPP WHERE APP_NAME = 'Eran';
+/*c2*/SELECT * FROM NEWAPP WHERE APP_NAME = 'Shelly';
+/*c4*/SELECT * FROM NEWAPP;
+
+--test correct persistent of view defined in TestSelfCreate.txt
+/*r
+  14,newdir,NULL
+*/select * from "View"
+
+/*r
+  14,newdir,NULL
+*/select * from "View2"
+
+--test INSERT .. INTO and indexes
+create cached table bewerb_copy  as (select * from bewerb) with data;
+create index idx_bewerb_copy on bewerb_copy(VCODE,ID);
+
+/*u0*/SHUTDOWN;
+
