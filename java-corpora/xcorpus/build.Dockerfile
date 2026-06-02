@@ -31,5 +31,8 @@ RUN --mount=type=bind,src=src/,target=src/ \
     jar cf /repo/fuzzer.jar -C target . && \
     rm -rf target/*
 
+RUN --mount=type=bind,src=target/adjust_line_numbers_to_pc.jar,target=lib/adjust_line_numbers_to_pc.jar \
+    find /repo -name '*.jar' -exec java -jar lib/adjust_line_numbers_to_pc.jar {} \;
+
 FROM scratch
 COPY --from=builder /repo/ /repo/

@@ -3,11 +3,9 @@ import os
 import sys
 import shutil
 
-EXPERIMENT = "fuzzing_seed"
-
 def handle_project(project_dir, project_name, data_dir):
 
-    compare_dir = os.path.join(project_dir, "target", "comparecg", EXPERIMENT)
+    compare_dir = os.path.join(project_dir, "target", "staticcg")
 
     if not os.path.exists(compare_dir):
         print(f"WARN: Missing comparison results for project {project_name} at {compare_dir}")

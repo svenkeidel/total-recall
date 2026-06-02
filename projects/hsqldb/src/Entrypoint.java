@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import java.sql.Connection;
@@ -20,16 +21,16 @@ public class Entrypoint {
             Connection conn = DriverManager.getConnection("jdbc:hsqldb:file:" + db.toString() + "/testdb", "SA", "");
 
             SqlFile sqlFile = new SqlFile(input);
-            sqlFile.addUserVars(Map.of(
-                "*SCRIPT_DIR", input.getParent()
-            ));
+            Map<String, String> userVars = new HashMap<>();
+            userVars.put("*SCRIPT_DIR", input.getParent());
+            sqlFile.addUserVars(userVars);
             sqlFile.setConnection(conn);
             sqlFile.execute();
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
         } finally {
             // Clean up the temporary files and directory
-            Runtime.getRuntime().exec("rm -rf " + db.toString()).waitFor();
+            deleteDirectory(db.toFile());
         }
     }
 
@@ -43,6 +44,16 @@ public class Entrypoint {
                 recurseDirectories(file);
             }
         }
+    }
+
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 
     public static void main(String[] args) throws Exception {

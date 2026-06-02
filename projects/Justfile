@@ -34,6 +34,7 @@ STATICCG_CONTAINER := "staticcg-" + PROJECT
 COMPARECG_CONTAINER := "comparecg-" + PROJECT
 
 JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
+ADJUST_LINE_NUMBERS_TO_PC_JAR := BASE_DIR / "lib/adjust_line_numbers_to_pc-1.0.0-SNAPSHOT.jar"
 JACOCO := BASE_DIR / "lib/jacoco"
 
 UID := `id -u`
@@ -71,6 +72,7 @@ build_jcg_image:
 build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
     mkdir -p {{TARGET_PATH}}
     cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
+    cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
     docker buildx build \
       --tag=$PROJECT \
@@ -81,7 +83,7 @@ build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
       {{PROJECT_PATH}}
 
     tar xf {{TARGET_PATH}}/repo.tar -C {{TARGET_PATH}}
-    rm {{TARGET_PATH}}/repo.tar {{TARGET_PATH}}/jazzer-api.jar
+    rm {{TARGET_PATH}}/repo.tar {{TARGET_PATH}}/jazzer-api.jar {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
 fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
     # Ensure directories exist
@@ -199,51 +201,66 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image
       {{JCG_IMAGE}} \
       {{DYNCG_TIMEOUT}} \
       {{DYNCG_MEMORY}} \
-      runMain Evaluation \
-      --input /jcg-conf/ \
-      --output /dyncg \
-      --program-args /corpus \
+      runMain Commandline analyze \
+      --projects-directory /jcg-conf/ \
+      --call-graphs-directory /dyncg \
       --adapter Dynamic \
       --algorithm-prefix Dynamic \
       --project-prefix $PROJECT \
+      --analysis-args /corpus \
+      --language java \
       --compress \
       --debug
 
 dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
 
 compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
-    mkdir -p {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}} 
-    touch {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-all.txt
-    touch {{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-package.txt
+    if [ ! -f {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz ]; then \
+        echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \
+        exit 0; \
+    fi
+    if [ ! -f {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/$PROJECT-callgraph.json.gz ]; then \
+        echo "cannot find static call graph {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/$PROJECT-callgraph.json.gz"; \
+        exit 0; \
+    fi
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it \
       --name {{COMPARECG_CONTAINER}} \
-      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/$PROJECT/Dynamic/Dynamic,target=/dynamiccg,readonly \
-      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}},target=/staticcg,readonly \
-      --mount=type=bind,source={{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-all.txt,target=/log.txt \
+      --mount=type=bind,source=/dev/null,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
       {{JCG_IMAGE}} \
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
-      runMain CompareCGs \
-      --input1 /dynamiccg/cg.gz \
-      --input2 /staticcg/cg.gz \
-      --showPrecisionRecall all \
-      --nonStrict
+      runMain Commandline precision-recall \
+        --projects-directory /jcg-conf/ \
+        --call-graphs-directory /staticcg \
+        --adapter {{FRAMEWORK}} \
+        --algorithm-prefix {{ALGO}} \
+        --language java \
+        --truth-callgraph-directory /dynamiccg \
+        --comparison-name all
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it \
       --name {{COMPARECG_CONTAINER}} \
-      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/$PROJECT/Dynamic/Dynamic,target=/dynamiccg,readonly \
-      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}},target=/staticcg,readonly \
-      --mount=type=bind,source={{TARGET_PATH}}/comparecg/{{EXPERIMENT}}/{{FRAMEWORK}}/{{ALGO}}/result-package.txt,target=/log.txt \
+      --mount=type=bind,source=/dev/null,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
       {{JCG_IMAGE}} \
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
-      runMain CompareCGs \
-      --input1 /dynamiccg/cg.gz \
-      --input2 /staticcg/cg.gz \
-      --showPrecisionRecall all \
-      --nonStrict \
-      --inPackage L$COMPARE_PACKAGE
+      runMain Commandline precision-recall \
+        --projects-directory /jcg-conf/ \
+        --call-graphs-directory /staticcg \
+        --adapter {{FRAMEWORK}} \
+        --algorithm-prefix {{ALGO}} \
+        --language java \
+        --truth-callgraph-directory /dynamiccg \
+        --comparison-name package \
+        --reachable-methods-include "L$COMPARE_PACKAGE.*" \
+        --edge-include ".*L$COMPARE_PACKAGE.*"
 
 [private]
 compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "context-insensitive")
@@ -254,7 +271,7 @@ compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA") (compare_callgraph
 [private]
 compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "RTA") (compare_callgraph "fuzzing_seed" "SootUp" "0-CFA") (compare_callgraph "fuzzing_seed" "SootUp" "1-CFA")
 [private]
-compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "PTA")
+compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "Taie" "PTA")
 [private]
 compare_valuecg: (compare_callgraph "fuzzing_seed" "ValueCG" "fast") (compare_callgraph "fuzzing_seed" "ValueCG" "precise")
 [private]
@@ -266,8 +283,8 @@ VALUECG_DIR := "/home/JCG/valuecg"
 VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
-    mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
-    touch {{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/log.txt
+    mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
+    touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
     docker rm -f {{STATICCG_CONTAINER}}
     docker run -it \
       --name {{STATICCG_CONTAINER}} \
@@ -279,16 +296,17 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg,target=/staticcg \
-      --mount=type=bind,source={{TARGET_PATH}}/staticcg/$PROJECT/{{FRAMEWORK}}/{{ALGO}}/log.txt,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt,target=/log.txt \
       {{JCG_IMAGE}} \
       {{STATICCG_TIMEOUT}} \
       {{STATICCG_MEMORY}} \
-      runMain Evaluation \
-      --input /jcg-conf/ \
-      --output /staticcg \
+      runMain Commandline analyze \
+      --projects-directory /jcg-conf/ \
+      --call-graphs-directory /staticcg \
       --adapter {{FRAMEWORK}} \
       --algorithm-prefix {{ALGO}} \
       --project-prefix $PROJECT \
+      --language java \
       --compress \
       --debug
 
@@ -303,7 +321,7 @@ sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" 
 [private]
 taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]
-valuecg_callgraphs: (static_callgraph "ValueCG" "fast") # (static_callgraph "ValueCG" "precise")
+valuecg_callgraphs: (static_callgraph "ValueCG" "fast") (static_callgraph "ValueCG" "precise")
 [private]
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
