@@ -47,6 +47,8 @@ static_callgraphs: (for_all_projects "static_callgraphs")
 
 compare_callgraphs: (for_all_projects "compare_callgraphs")
 
+jdk_callbacks: (for_all_projects "jdk_callbacks")
+
 build_plot_image:
     docker build --tag {{PLOT_IMAGE}} ./plot
 

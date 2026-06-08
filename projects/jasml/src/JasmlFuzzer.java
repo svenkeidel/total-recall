@@ -8,7 +8,7 @@ public class JasmlFuzzer {
         Path temp = Files.createTempFile("fuzzing", ".class");
         try {
             Files.write(temp, data.consumeRemainingAsBytes());
-            Entrypoint.entrypoint(temp.toFile());
+            Entrypoint.entrypoint(temp);
         } finally {
             Files.delete(temp);
         }

@@ -1,6 +1,6 @@
-import java.io.File;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import edu.umd.cs.findbugs.FindBugs2;
 
@@ -9,7 +9,7 @@ import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.Repository;
 
 public class Entrypoint {
-    public static void entrypoint(File jar) {
+    public static void entrypoint(Path jar) {
         try {
             FindBugs2.main(new String[] {
                     "-effort:max",
@@ -45,13 +45,10 @@ public class Entrypoint {
             exc.printStackTrace(System.out);
         }
     }
-    public static void recurseDirectories(File path) throws IOException {
-        for(File inputFile: path.listFiles()) {
-            if(inputFile.isFile()) {
-                System.out.println(inputFile.toString());
+    public static void recurseDirectories(Path path) throws Exception {
+        try(Stream<Path> files = Files.walk(path)) {
+            for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
                 Entrypoint.entrypoint(inputFile);
-            } else {
-                recurseDirectories(inputFile);
             }
         }
     }
@@ -71,6 +68,6 @@ public class Entrypoint {
 
     public static void main(String args[]) throws Throwable {
         patchBCELClasses();
-        recurseDirectories(new File(args[0]));
+        recurseDirectories(Paths.get(args[0]));
     }
 }

@@ -1,6 +1,7 @@
 import java.io.File;
-import java.nio.file.Files;
 import java.io.IOException;
+import java.nio.file.*;
+import java.util.stream.Stream;
 
 import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -35,17 +36,17 @@ public class Entrypoint {
             exc.printStackTrace(System.out);
         }
     }
-    public static void recurseDirectories(File path) throws IOException {
-        for(File inputFile: path.listFiles()) {
-            if(inputFile.isFile()) {
-                String input = InputParser.parseString(Files.readAllBytes(inputFile.toPath()));
+
+    public static void recurseDirectories(Path path) throws Exception {
+        try(Stream<Path> files = Files.walk(path)) {
+            for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
+                String input = InputParser.parseString(Files.readAllBytes(inputFile));
+                // Reads the contents of each file, parses it into a string, and passes it to the `entrypoint` method for execution.
                 Entrypoint.entrypoint(input);
-            } else {
-                recurseDirectories(inputFile);
             }
         }
     }
-    public static void main(String args[]) throws IOException {
-        recurseDirectories(new File(args[0]));
+    public static void main(String args[]) throws Exception {
+        recurseDirectories(Paths.get(args[0]));
     }
 }

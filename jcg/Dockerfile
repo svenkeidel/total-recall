@@ -23,7 +23,7 @@ RUN apt-get update && \
     apt-get -y install sudo apt-transport-https ca-certificates software-properties-common apt-utils  \
                        git curl less nano vim zip zlib1g-dev wget python3.5 unzip aptitude make gcc g++ \
                        libtool libncurses5-dev libopenmpi-dev openmpi-bin libsqlite3-dev libffi-dev mcpp \
-                       flex bison clang build-essential cmake doxygen sqlite3
+                       flex bison clang build-essential cmake doxygen sqlite3 libboost-all-dev
 
 # Disable sudo password prompt for all users
 RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -52,6 +52,7 @@ RUN cd ${JDK_DIR} && \
 RUN sudo update-alternatives --install /usr/bin/java java /opt/jdk-26+35/bin/java 1000 && \
     sudo update-alternatives --install /usr/bin/javac javac /opt/jdk-26+35/bin/javac 1000 && \
     sudo update-alternatives --install /usr/bin/jar jar /opt/jdk-26+35/bin/jar 1000
+ENV JAVA_HOME="/opt/jdk-26+35/"
 
 ## install sbt
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list && \
@@ -107,16 +108,15 @@ RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-0
     git reset --hard ${DOOP_REVISION} && \
     ./gradlew installDist
 
-## install JCG (02.06.2026)
+## install JCG (08.06.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_REVISION="0c2a83c891cdfa27b93dec1b6bc686a0c945eb8c"
+ARG JCG_REVISION="21d005d53cbeea3613db3410dff55ac54fb2abb2"
 ARG JCG_DIR="/home/$USER/JCG"
 RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \
     git checkout ${JCG_BRANCH} && \
     git reset --hard ${JCG_REVISION} && \
-    sbt -java-home /opt/jdk-26+35/ compile && \
-    git clone https://github.com/pascal-lab/java-benchmarks
+    sbt -java-home /opt/jdk-26+35/ compile
 
 # Install OpenJDK 8 version 342
 COPY jre.conf $JCG_DIR/jre.conf

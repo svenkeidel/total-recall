@@ -1,24 +1,26 @@
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
 import java.io.IOException;
+import java.nio.file.*;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
+
 import org.javacc.parser.Main;
 import org.javacc.jjdoc.JJDocMain;
 
 public class Entrypoint {
   /**
      * 
-     * @param grammarFile The grammar file to be processed.
+     * @param grammarPath The grammar file to be processed.
      */
-    public static void entrypoint(File grammarFile) throws IOException {
+    public static void entrypoint(Path grammarPath) throws IOException {
 
         Path output = Files.createTempDirectory("javacc");
         Path documentation = output.resolve("documentation.html");
 
         try {
-            org.javacc.parser.Main.main(new String[] { "-OUTPUT_DIRECTORY="+output.toAbsolutePath().toString(), grammarFile.getAbsolutePath()});
-            org.javacc.jjdoc.JJDocMain.main(new String[]{ "-OUTPUT_FILE="+documentation.toAbsolutePath().toString(), grammarFile.getAbsolutePath()});
+            String grammar = grammarPath.toAbsolutePath().toString();
+            org.javacc.parser.Main.main(new String[] { "-OUTPUT_DIRECTORY="+output.toAbsolutePath().toString(), grammar});
+            org.javacc.jjdoc.JJDocMain.main(new String[]{ "-OUTPUT_FILE="+documentation.toAbsolutePath().toString(), grammar});
         } catch(Throwable t) {
             t.printStackTrace(); 
         } finally {
@@ -26,14 +28,10 @@ public class Entrypoint {
         }
     }
 
-    // Recursively processes files in a given directory.
-    public static void recurseDirectories(File path) throws Exception {
-        if (path.isFile()) {
-            // Reads the contents of each file, parses it into a string, and passes it to the `entrypoint` method for execution.
-            Entrypoint.entrypoint(path);
-        } else {
-            for (File file : path.listFiles()) {
-                recurseDirectories(file);
+    public static void recurseDirectories(Path path) throws Exception {
+        try(Stream<Path> files = Files.walk(path)) {
+            for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
+                Entrypoint.entrypoint(inputFile);
             }
         }
     }
@@ -49,6 +47,6 @@ public class Entrypoint {
     }
 
     public static void main(String args[]) throws Exception {
-        recurseDirectories(new File(args[0]));
+        recurseDirectories(Paths.get(args[0]));
     }
 }

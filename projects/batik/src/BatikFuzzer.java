@@ -6,12 +6,12 @@ import java.nio.file.Path;
 import java.io.IOException;
 
 public class BatikFuzzer {
-    public static void fuzzerTestOneInput(FuzzedDataProvider data) throws IOException {
+    public static void fuzzerTestOneInput(FuzzedDataProvider data) throws Exception {
         BugDetectors.allowNetworkConnections();
         Path temp = Files.createTempFile("fuzzing", ".svg");
         try {
             Files.write(temp, data.consumeRemainingAsBytes());
-            Entrypoint.entrypoint(temp.toFile());
+            Entrypoint.entrypoint(temp);
         } finally {
             Files.delete(temp);
         }

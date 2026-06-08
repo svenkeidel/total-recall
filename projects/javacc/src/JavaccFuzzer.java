@@ -9,14 +9,8 @@ public class JavaccFuzzer {
         // Create a temporary file for fuzzing input
         Path temp = Files.createTempFile("fuzzing", ".jj");
         try {
-            byte[] fuzzData = data.consumeRemainingAsBytes();
-            Files.write(temp, fuzzData);
-
-            // Log the generated fuzzing data
-            String fuzzContent = new String(fuzzData, StandardCharsets.UTF_8);
-            System.out.println("Generated fuzzing file content:\n" + fuzzContent);
-
-            Entrypoint.entrypoint(temp.toFile());
+            Files.write(temp, data.consumeRemainingAsString().getBytes());
+            Entrypoint.entrypoint(temp);
         } finally {
             Files.delete(temp);
         }

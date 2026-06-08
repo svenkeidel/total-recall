@@ -18,7 +18,7 @@ public class FindbugsFuzzer {
         Path temp = Files.createTempFile("fuzzing", ".jar");
         try {
             Files.write(temp, data.consumeRemainingAsBytes());
-            Entrypoint.entrypoint(temp.toFile());
+            Entrypoint.entrypoint(temp);
         } finally {
             Files.delete(temp);
         }

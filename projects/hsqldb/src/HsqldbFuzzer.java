@@ -10,7 +10,7 @@ public class HsqldbFuzzer {
         Path sqlFile = Files.createTempFile("fuzzing", ".hsqldb");
         try {
             Files.write(sqlFile, data.consumeRemainingAsString().getBytes());
-            Entrypoint.entrypoint(sqlFile.toFile());
+            Entrypoint.entrypoint(sqlFile);
         } finally {
             Files.delete(sqlFile);
         }

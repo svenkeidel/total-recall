@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jazzer-api">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/findbugs/target/jazzer-api.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

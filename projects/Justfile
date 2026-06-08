@@ -16,10 +16,10 @@ FUZZING_THREADS := "8"
 FUZZING_TIME := "3600"
 
 DYNCG_TIMEOUT := "999m"
-DYNCG_MEMORY := "400G"
+DYNCG_MEMORY := "28G"
 
 STATICCG_TIMEOUT := "180m"
-STATICCG_MEMORY := "400G"
+STATICCG_MEMORY := "28G"
 
 COMPARECG_TIMEOUT := "999m"
 COMPARECG_MEMORY := "28G"
@@ -32,6 +32,7 @@ COVERAGE_CONTAINER := "coverage-" + PROJECT
 DYNCG_CONTAINER := "dyncg-" + PROJECT
 STATICCG_CONTAINER := "staticcg-" + PROJECT
 COMPARECG_CONTAINER := "comparecg-" + PROJECT
+JDK_CALLBACKS_CONTAINER := "jdk-callbacks-" + PROJECT
 
 JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
 ADJUST_LINE_NUMBERS_TO_PC_JAR := BASE_DIR / "lib/adjust_line_numbers_to_pc-1.0.0-SNAPSHOT.jar"
@@ -187,17 +188,18 @@ coverage_fuzzing_seed: (prepare_seed_corpus "fuzzing_seed") (fuzz "fuzzing_seed"
 
 [private]
 dynamic_callgraph EXPERIMENT: build_project build_jcg_image
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg {{PROJECT_PATH}}/resources/
-    touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/log.txt
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
+    touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
     docker run -it \
       --name {{DYNCG_CONTAINER}} \
+      --memory={{DYNCG_MEMORY}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg,target=/dyncg \
-      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/log.txt,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt,target=/log.txt \
       {{JCG_IMAGE}} \
       {{DYNCG_TIMEOUT}} \
       {{DYNCG_MEMORY}} \
@@ -226,6 +228,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it \
       --name {{COMPARECG_CONTAINER}} \
+      --memory={{COMPARECG_MEMORY}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
@@ -326,6 +329,26 @@ valuecg_callgraphs: (static_callgraph "ValueCG" "fast") (static_callgraph "Value
 wala_callgraphs: (static_callgraph "WALA" "CHA") (static_callgraph "WALA" "RTA") (static_callgraph "WALA" "0-CFA") (static_callgraph "WALA" "1-CFA") (static_callgraph "WALA" "0-1-CFA")
 
 static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgraphs taie_callgraphs valuecg_callgraphs wala_callgraphs
+
+jdk_callbacks: build_jcg_image
+    docker rm -f {{JDK_CALLBACKS_CONTAINER}}
+    docker run -it \
+      --name {{JDK_CALLBACKS_CONTAINER}} \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg_conf,target={{VALUECG_CONFIG_DIR}} \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg,target=/staticcg \
+      {{JCG_IMAGE}} \
+      {{STATICCG_TIMEOUT}} \
+      {{STATICCG_MEMORY}} \
+      runMain Commandline jdk-callbacks \
+        --projects-directory /jcg-conf/ \
+        --call-graphs-directory /staticcg \
+        --project-prefix $PROJECT \
+        --adapter Dynamic \
+        --reachable-methods-include "L$COMPARE_PACKAGE.*" \
+        --language java \
+        --debug
 
 [private]
 clean_experiment EXPERIMENT:
