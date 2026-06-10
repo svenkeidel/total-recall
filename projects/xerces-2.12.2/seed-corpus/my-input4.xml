@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE note SYSTEM
+"https://www.w3schools.com/xml/note.dtd">
+
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>

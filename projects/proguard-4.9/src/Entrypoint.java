@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 import java.util.ArrayList;
 
-import proguard.ClassPath;
-import proguard.ClassPathEntry;
-import proguard.Configuration;
-import proguard.ProGuard;
+import proguard.*;
 
 class Entrypoint {
     public static void entrypoint(Path inputJar) throws Exception {
@@ -18,18 +15,29 @@ class Entrypoint {
 
         try {
             Configuration configuration = new Configuration();
+            ConfigurationParser parser = new ConfigurationParser(new String[] {
+                    "-injars", inputJar.toString(),
+                    "-outjars", outputJar.toString(),
+                    "-libraryjars", jdk.toString()+"(!**.jar;!module-info.class)",
+                    "-optimizationpasses", "5",
+                    "-overloadaggressively",
+                    "-allowaccessmodification",
+                    "-mergeinterfacesaggressively",
+                    "-useuniqueclassmembernames",
+                    "-repackageclasses", "''",
+                    "-keep", "public", "class", "Entrypoint",
+                    "-keepattributes", "SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,Deprecated,Annotation",
+                    "-dontskipnonpubliclibraryclasses",
+                    "-dontskipnonpubliclibraryclassmembers"
+                },
+                System.getProperties());
+            try {
+                parser.parse(configuration);
+            } finally {
+                parser.close();
+            }
 
-            configuration.programJars = new ClassPath();
-            configuration.programJars.add(new ClassPathEntry(inputJar.toFile(), false));
-            configuration.programJars.add(new ClassPathEntry(outputJar.toFile(), true));
-
-            configuration.libraryJars = new ClassPath();
-            configuration.libraryJars.add(new ClassPathEntry(jdk.toFile(), false));
-
-            configuration.keepDirectories = new ArrayList();
-
-            ProGuard proGuard = new ProGuard(configuration);
-            proGuard.execute();
+            new ProGuard(configuration).execute();
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
         } finally {

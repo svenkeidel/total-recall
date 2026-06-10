@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.stream.Stream;
 import java.util.ArrayList;
 
-import proguard.ProGuard;
+import proguard.*;
 
 public class Entrypoint {
     public static void entrypoint(Path inputJar) throws Exception {
@@ -15,8 +15,8 @@ public class Entrypoint {
         Path outputJar = result.resolve("output.jar");
 
         try {
-            ProGuard.main(
-                new String[] {
+            Configuration configuration = new Configuration();
+            ConfigurationParser parser = new ConfigurationParser(new String[] {
                     "-injars", inputJar.toString(),
                     "-outjars", outputJar.toString(),
                     "-libraryjars", jdk.toString()+"(!**.jar;!module-info.class)",
@@ -30,8 +30,15 @@ public class Entrypoint {
                     "-keepattributes", "SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,Deprecated,Annotation",
                     "-dontskipnonpubliclibraryclasses",
                     "-dontskipnonpubliclibraryclassmembers"
-                }
-            );
+            },
+                    System.getProperties());
+            try {
+                parser.parse(configuration);
+            } finally {
+                parser.close();
+            }
+
+            new ProGuard(configuration).execute();
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
         } finally {

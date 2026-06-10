@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="xercesImpl">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/xerces-2.10.0/xerces-2.10.0/bin/xercesImpl.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

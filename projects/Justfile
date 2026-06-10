@@ -38,7 +38,7 @@ JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
 ADJUST_LINE_NUMBERS_TO_PC_JAR := BASE_DIR / "lib/adjust_line_numbers_to_pc-1.0.0-SNAPSHOT.jar"
 JACOCO := BASE_DIR / "lib/jacoco"
 
-export JAVA_VERSION := shell("jq '.java' " + PROJECT_PATH + "/jcg.conf")
+export JAVA_VERSION := shell("jq \".java\" " + PROJECT_PATH + "/jcg.conf")
 UID := `id -u`
 GID := `id -g`
 
@@ -78,7 +78,7 @@ build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
     cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
     docker buildx build \
-      --tag=$PROJECT \
+      --tag={{lowercase(PROJECT)}} \
       --build-arg PROJECT=$PROJECT \
       --output type=tar,dest={{TARGET_PATH}}/repo.tar \
       -f {{PROJECT_PATH}}/../build-java$JAVA_VERSION.Dockerfile \
@@ -87,7 +87,22 @@ build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
     tar xf {{TARGET_PATH}}/repo.tar -C {{TARGET_PATH}}
     rm {{TARGET_PATH}}/repo.tar {{TARGET_PATH}}/jazzer-api.jar {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
-fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
+
+[private]
+prepare_corpus EXPERIMENT:
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    if [ -f  {{PROJECT_PATH}}/prepare_base_corpus.sh ]; then \
+      {{PROJECT_PATH}}/prepare_base_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus; \
+    fi
+    if [ -f  {{PROJECT_PATH}}/prepare_seed_corpus.sh ]; then \
+      {{PROJECT_PATH}}/prepare_seed_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus; \
+    fi
+    if [ -f  {{PROJECT_PATH}}/prepare_dictionary.sh ]; then \
+      {{PROJECT_PATH}}/prepare_dictionary.sh {{TARGET_PATH}}/{{EXPERIMENT}}; \
+    fi
+
+
+fuzz EXPERIMENT: (prepare_corpus EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
     # Ensure directories exist
     mkdir -p {{PROJECT_PATH}}/resources \
              {{TARGET_PATH}}/{{EXPERIMENT}}/corpus \
@@ -118,7 +133,7 @@ fuzz EXPERIMENT: (prepare_dictionary EXPERIMENT) build_project build_jazzer_imag
            corpus
 
 [private]
-coverage EXPERIMENT: build_jazzer_image build_project && (coverage_report EXPERIMENT "coverage" "false")
+coverage EXPERIMENT: build_jazzer_image build_project (prepare_corpus EXPERIMENT) && (coverage_report EXPERIMENT "coverage" "false")
     mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/coverage {{PROJECT_PATH}}/resources
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec
 
@@ -131,7 +146,7 @@ coverage EXPERIMENT: build_jazzer_image build_project && (coverage_report EXPERI
                --mount type=bind,source={{JACOCO}}/jacocoagent.jar,target=/jacocoagent.jar,readonly \
                --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
                --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec,target=/coverage/coverage.exec \
-               --entrypoint /opt/jdk8u342-b07/bin/java \
+               --entrypoint /opt/jdk-26+35/bin/java \
                {{JCG_IMAGE}} \
                -cp '/repo/*' \
                -Djava.library.path=/repo/ \
@@ -160,35 +175,9 @@ coverage_report EXPERIMENT COVERAGE_DIR EXCLUDE_CLASSES:
 
     rm -rf {{TARGET_PATH}}/classes
 
-[private]
-prepare_base_corpus EXPERIMENT:
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
-    {{PROJECT_PATH}}/prepare_base_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
 
 [private]
-prepare_seed_corpus EXPERIMENT: (prepare_base_corpus EXPERIMENT)
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
-    {{PROJECT_PATH}}/prepare_seed_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
-
-[private]
-prepare_dictionary EXPERIMENT:
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}
-    {{PROJECT_PATH}}/prepare_dictionary.sh {{TARGET_PATH}}/{{EXPERIMENT}}
-
-# Record coverage of base seed corpus only, no manual extensions
-coverage_base_seed: (prepare_base_corpus "base_seed") (coverage "base_seed")
-
-# Record coverage of seed corpus
-coverage_seed: (prepare_seed_corpus "seed") (coverage "seed")
-
-# Record coverage after fuzzing without seed corpus, but dictionary
-coverage_fuzzing: (fuzz "fuzzing") (coverage "fuzzing")
-
-# Record coverage after fuzzing with seed corpus and dictionary
-coverage_fuzzing_seed: (prepare_seed_corpus "fuzzing_seed") (fuzz "fuzzing_seed") (coverage "fuzzing_seed")
-
-[private]
-dynamic_callgraph EXPERIMENT: build_project build_jcg_image
+dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPERIMENT)
     mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
@@ -351,6 +340,16 @@ jdk_callbacks: build_jcg_image
         --language java \
         --debug
 
+fatjar: build_project
+    rm -rf {{TARGET_PATH}}/fatjar
+    mkdir -p {{TARGET_PATH}}/fatjar
+    find {{TARGET_PATH}}/repo -name '*.jar' -exec unzip -o {} -d {{TARGET_PATH}}/fatjar \;
+    rm -rf {{TARGET_PATH}}/fatjar/{META-INF,*Fuzzer.class,module-info.class}
+    jar cf {{TARGET_PATH}}/$PROJECT.jar -C {{TARGET_PATH}}/fatjar .
+    rm -rf {{TARGET_PATH}}/fatjar
+    mkdir -p {{TARGET_PATH}}/fatjar
+    mv {{TARGET_PATH}}/$PROJECT.jar {{TARGET_PATH}}/fatjar
+
 [private]
 clean_experiment EXPERIMENT:
     rm -rf {{TARGET_PATH}}/{{EXPERIMENT}}
@@ -369,5 +368,3 @@ clean_project_build:
     rm -rf {{TARGET_PATH}}/repo
 
 clean: clean_all_experiments clean_dyncg clean_staticcg
-
-default: coverage_seed coverage_fuzzing coverage_fuzzing_seed
