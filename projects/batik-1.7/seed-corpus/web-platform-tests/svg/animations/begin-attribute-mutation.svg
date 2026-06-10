@@ -1,0 +1,6 @@
+<svg>
+  <rect width="100" height="100" fill="blue">
+    <animate id="anim" attributeName="x" values="100; 0"
+             begin="0s" dur="50ms" fill="freeze"/>
+  </rect>
+</svg>

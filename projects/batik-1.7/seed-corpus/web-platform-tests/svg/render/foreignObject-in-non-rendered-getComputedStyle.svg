@@ -1,0 +1,9 @@
+<svg>
+  <radialGradient>
+    <pattern>
+      <foreignObject id="foreignObject">
+        <div id="foRoot"></div>
+      </foreignObject>
+    </pattern>
+  </radialGradient>
+</svg>

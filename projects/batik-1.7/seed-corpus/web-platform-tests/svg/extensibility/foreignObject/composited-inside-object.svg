@@ -1,0 +1,5 @@
+  <svg>
+    <foreignObject>
+      <div style="will-change: transform">Test</div>
+    </foreignObject>
+  </svg>

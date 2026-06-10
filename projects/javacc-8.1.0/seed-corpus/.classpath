@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="GUIParsing/ParserVersion"/>
+	<classpathentry kind="src" path="GUIParsing/TokenMgrVersion"/>
+	<classpathentry kind="src" path="Interpreter"/>
+	<classpathentry excluding="1.5/" kind="src" path="JavaGrammars"/>
+	<classpathentry kind="src" path="JavaGrammars/1.5"/>
+	<classpathentry kind="src" path="JJTreeExamples"/>
+	<classpathentry excluding="input/" kind="src" path="Obfuscator"/>
+	<classpathentry kind="src" path="Obfuscator/input"/>
+	<classpathentry kind="src" path="Transformer"/>
+	<classpathentry kind="src" path="VTransformer"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

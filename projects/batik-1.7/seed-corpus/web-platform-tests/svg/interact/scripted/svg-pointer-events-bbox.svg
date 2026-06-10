@@ -1,0 +1,12 @@
+<svg id="svgRoot" width="800px" height="360px" viewBox="0 0 800 360" opacity="0">
+  <g class="test" id="test1" transform="rotate(15)">
+    <circle id="circle1" cx="50" cy="50" r="10"/>
+    <circle cx="150" cy="150" r="10"/>
+  </g>
+  <circle class="test" id="circle2" cx="400" cy="150" r="50" visibility="hidden"/>
+  <text class="test" id="text1" x="100" y="20">Text should change color when mouse is within <tspan id="tspan1" dy="3em">the bbox.</tspan></text>
+  <text class="test" id="text2" x="150" y="100" transform="rotate(15)">Text should change color when mouse is within <tspan id="tspan2" dy="3em">the bbox.</tspan></text>
+  <text class="test" id="text3" x="200" y="280" transform="rotate(5)">Text should end here.<tspan id="tspan3" dy="2em" display="none">invisible</tspan></text>
+  <image class="test" id="image1" xlink:href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 30'><rect x='10' y='10' width='20' height='10' fill='blue'/></svg>"
+         width="50" height="30" visibility="hidden" transform="translate(0,200)"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg>
+  <animate id="anim" attributeName="visibility" to="visible" begin="10s" dur="2s"/>
+  <rect x="0" y="0" width="0" height="100" fill="#0F0">
+    <set attributeName="width" fill="freeze" to="100" begin="anim.begin"/>
+  </rect>
+</svg>

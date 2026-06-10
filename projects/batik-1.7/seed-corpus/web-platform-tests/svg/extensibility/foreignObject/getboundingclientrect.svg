@@ -1,0 +1,5 @@
+<svg>
+  <foreignObject x="20" y="10" width="200" height="100">
+    <div id="descendant"></div>
+  </foreignObject>
+</svg>

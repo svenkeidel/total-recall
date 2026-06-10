@@ -1,0 +1,6 @@
+  <svg width="200" height="200">
+    <!-- missing/invalid mask is equivalent to transparent black - nothing displayed -->
+    <foreignObject x="0" y="0" width="200" height="200" style="mask: url('#notfound');">
+      <div style="width: 200px; height: 200px; background: red"></div>
+    </foreignObject>
+  </svg>

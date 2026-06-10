@@ -1,0 +1,5 @@
+<svg>
+  <rect width="100" height="100" fill="orange">
+    <animate attributeName="fill" values="blue;red" dur="10ms" fill="freeze"/>
+  </rect>
+</svg>

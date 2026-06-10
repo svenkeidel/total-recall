@@ -1,0 +1,8 @@
+<svg>
+  <rect class="base">
+    <set attributeName="class" to="animated"/>
+  </rect>
+  <rect>
+    <set attributeName="class" to="animated"/>
+  </rect>
+</svg>

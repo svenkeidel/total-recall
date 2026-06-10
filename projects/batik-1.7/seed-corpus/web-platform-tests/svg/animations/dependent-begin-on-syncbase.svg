@@ -1,0 +1,9 @@
+<svg>
+  <rect width="10" height="10" fill="red">
+    <set attributeName="fill" to="blue" begin="0s; other.end" id="dependent"/>
+  </rect>
+  <rect x="10" width="10" height="10" fill="blue">
+    <animate attributeName="fill" from="yellow" to="red"
+             begin="indefinite" dur="10ms" id="other"/>
+  </rect>
+</svg>

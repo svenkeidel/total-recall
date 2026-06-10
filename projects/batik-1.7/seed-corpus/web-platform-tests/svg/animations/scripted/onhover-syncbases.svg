@@ -1,0 +1,6 @@
+    <svg>
+      <circle id="circle" cx="150" cy="75" r="50" fill="#F00">
+      <set attributeName="fill" to="#0F0" begin="mouseover"/>
+      <set attributeName="fill" to="#F00" begin="mouseout"/>
+      </circle>
+    </svg>

@@ -1,0 +1,7 @@
+<svg height=500>
+  <rect class="test1" x="10" y="10" width="20" height="20" fill="green"/>
+
+  <rect class="test2" x="10" y="50" width="20" height="20" fill="green"/>
+
+  <text font-family="Ahem" font-size="100px" class="test1" x="10" y="200">X</text>
+</svg>

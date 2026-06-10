@@ -1,0 +1,13 @@
+<svg>
+  <rect id="rect1" x="1" y="2" width="-10" height="20"/>
+  <rect id="rect2" x="1" y="2" width="10" height="-20"/>
+  <circle id="circle" cx="1" cy="2" r="-10"/>
+  <ellipse id="ellipse1" cx="1" cy="12" rx="-5" ry="10"/>
+  <ellipse id="ellipse2" cx="6" cy="2" rx="5" ry="-10"/>
+  <image id="image1" x="1" y="2" width="-10" height="20" href="/images/green-100x50.png"/>
+  <image id="image2" x="1" y="2" width="10" height="-20" href="/images/green-100x50.png"/>
+  <image id="image3" x="1" y="2" width="-10" height="20"/>
+  <image id="image4" x="1" y="2" width="10" height="-20"/>
+  <foreignObject id="foreign1" x="1" y="2" width="-10" height="20"/>
+  <foreignObject id="foreign2" x="1" y="2" width="10" height="-20"/>
+</svg>

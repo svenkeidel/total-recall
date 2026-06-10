@@ -38,6 +38,7 @@ JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
 ADJUST_LINE_NUMBERS_TO_PC_JAR := BASE_DIR / "lib/adjust_line_numbers_to_pc-1.0.0-SNAPSHOT.jar"
 JACOCO := BASE_DIR / "lib/jacoco"
 
+export JAVA_VERSION := shell("jq '.java' " + PROJECT_PATH + "/jcg.conf")
 UID := `id -u`
 GID := `id -g`
 
@@ -72,15 +73,15 @@ build_jcg_image:
 
 build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
     mkdir -p {{TARGET_PATH}}
+    cp -r {{PROJECT_PATH}}/repo {{TARGET_PATH}}/repo
     cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
     cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
     docker buildx build \
       --tag=$PROJECT \
       --build-arg PROJECT=$PROJECT \
-      --build-arg XCORPUS_PROJECT_PATH=$XCORPUS_PROJECT_PATH \
       --output type=tar,dest={{TARGET_PATH}}/repo.tar \
-      -f {{BASE_DIR}}/java-corpora/xcorpus/build.Dockerfile \
+      -f {{PROJECT_PATH}}/../build-java$JAVA_VERSION.Dockerfile \
       {{PROJECT_PATH}}
 
     tar xf {{TARGET_PATH}}/repo.tar -C {{TARGET_PATH}}
@@ -130,8 +131,8 @@ coverage EXPERIMENT: build_jazzer_image build_project && (coverage_report EXPERI
                --mount type=bind,source={{JACOCO}}/jacocoagent.jar,target=/jacocoagent.jar,readonly \
                --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
                --mount type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec,target=/coverage/coverage.exec \
-               --entrypoint /usr/bin/java \
-               {{FUZZING_IMAGE}} \
+               --entrypoint /opt/jdk8u342-b07/bin/java \
+               {{JCG_IMAGE}} \
                -cp '/repo/*' \
                -Djava.library.path=/repo/ \
                -javaagent:/jacocoagent.jar=destfile=/coverage/coverage.exec,includes=$COVERAGE_INCLUDES \

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="91.74mm" height="180.62mm" viewBox="0 0 9174 18062" preserveAspectRatio="xMidYMid" fill-rule="evenodd" clip-path="url(#presentation_clip_path)" stroke-width="28.222"  xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <defs class="ClipPathGroup">
+  <clipPath id="presentation_clip_path" clipPathUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="9174" height="18062"/>
+  </clipPath>
+ </defs>
+ <defs class="TextShapeIndex">
+  
+ </defs>
+ <defs class="TextEmbeddedBitmaps"/>
+ <g>
+  <g id="id2" class="Master_Slide">
+   <g id="bg-id2" class="Background"/>
+   <g id="bo-id2" class="BackgroundObjects"/>
+  </g>
+ </g>
+ <g class="SlideGroup">
+  <g>
+   <g id="id1" class="Slide" clip-path="url(#presentation_clip_path)">
+    <g class="Page">
+     <g class="Group">
+      <g class="com.sun.star.drawing.RectangleShape">
+       <g id="id3"/>
+      </g>
+      <g class="com.sun.star.drawing.PolyPolygonShape">
+       <g id="id4"><animate id="first" attributeName="opacity" from="100" to="100" begin="0ms; last.end" dur="5000ms"/>
+        <path fill="none" stroke="rgb(0,0,0)" stroke-width="141" d="M 4589,213 L 4589,17848"/>
+       </g>
+      </g>
+      <g class="Group" opacity="0"><animate id="last" attributeName="opacity"  from="100" to="100" begin="first.end" dur="5000ms"/>
+       <g class="com.sun.star.drawing.EllipseShape">
+        <g id="id5">
+         <path fill="rgb(255,255,255)" stroke="none" d="M 4590,390 C 4557,390 4530,383 4502,366 4473,350 4453,330 4437,302 4420,273 4413,246 4413,213 4413,180 4420,153 4437,125 4453,96 4473,76 4502,60 4530,43 4557,36 4590,36 4623,36 4650,43 4679,60 4707,76 4727,96 4743,124 4760,153 4767,180 4767,213 4767,246 4760,273 4743,301 4727,330 4707,350 4679,366 4650,383 4623,390 4590,390 L 4590,390 Z"/>
+         <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" d="M 4590,390 C 4557,390 4530,383 4502,366 4473,350 4453,330 4437,302 4420,273 4413,246 4413,213 4413,180 4420,153 4437,125 4453,96 4473,76 4502,60 4530,43 4557,36 4590,36 4623,36 4650,43 4679,60 4707,76 4727,96 4743,124 4760,153 4767,180 4767,213 4767,246 4760,273 4743,301 4727,330 4707,350 4679,366 4650,383 4623,390 4590,390 L 4590,390 Z"/>
+        </g>
+       </g>
+       <g class="com.sun.star.drawing.EllipseShape">
+        <g id="id6">
+         <path fill="rgb(255,255,255)" stroke="none" d="M 4589,17672 C 4622,17672 4649,17679 4678,17696 4706,17712 4726,17732 4742,17761 4759,17789 4766,17816 4766,17849 4766,17882 4759,17909 4742,17938 4726,17966 4706,17986 4678,18002 4649,18019 4622,18026 4589,18026 4556,18026 4529,18019 4501,18002 4472,17986 4452,17966 4436,17938 4419,17909 4412,17882 4412,17849 4412,17816 4419,17789 4436,17761 4452,17732 4472,17712 4501,17696 4529,17679 4556,17672 4589,17672 L 4589,17672 Z"/>
+         <path fill="none" stroke="rgb(0,0,0)" stroke-width="71" d="M 4589,17672 C 4622,17672 4649,17679 4678,17696 4706,17712 4726,17732 4742,17761 4759,17789 4766,17816 4766,17849 4766,17882 4759,17909 4742,17938 4726,17966 4706,17986 4678,18002 4649,18019 4622,18026 4589,18026 4556,18026 4529,18019 4501,18002 4472,17986 4452,17966 4436,17938 4419,17909 4412,17882 4412,17849 4412,17816 4419,17789 4436,17761 4452,17732 4472,17712 4501,17696 4529,17679 4556,17672 4589,17672 L 4589,17672 Z"/>
+        </g>
+       </g>
+      </g>
+     </g>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

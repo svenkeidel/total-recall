@@ -1,0 +1,5 @@
+<svg>
+  <filter id="filter">
+    <feImage xlink:href="#svg"></feImage>
+  </filter>
+</svg>

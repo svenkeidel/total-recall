@@ -12,5 +12,7 @@
     <orderEntry type="library" name="org.jacoco.agent-0.8.14.202510111229" level="project" />
     <orderEntry type="library" name="adjust_line_numbers_to_pc-1.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="jazzer-api" level="project" />
+    <orderEntry type="library" name="commons-codec-1.2" level="project" />
+    <orderEntry type="library" name="xercesImpl" level="project" />
   </component>
 </module>

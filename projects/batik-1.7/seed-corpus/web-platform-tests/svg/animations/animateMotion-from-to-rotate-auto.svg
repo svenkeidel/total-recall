@@ -1,0 +1,6 @@
+<svg>
+  <rect x="-200" width="200" height="100" fill="blue">
+    <animateMotion id="anim" from="0,400" to="0,-100" rotate="auto"
+                   fill="freeze" dur="4s"/>
+  </rect>
+</svg>

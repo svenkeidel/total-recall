@@ -1,0 +1,8 @@
+<svg>
+  <rect width="50" height="100" fill="red">
+    <set id="anim1" attributeName="fill" to="green" begin="5s" dur="1s" repeatCount="2" fill="freeze"/>
+  </rect>
+  <rect width="50" height="100" x="50" fill="red">
+    <set id="anim2" attributeName="fill" to="green" begin="9s" dur="11s"/>
+  </rect>
+</svg>

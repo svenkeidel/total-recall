@@ -1,0 +1,3 @@
+    <svg xmlns="http://www.w3.org/2000/svg">
+        <rect x="25" y="25" width="50" height="50" fill="color-mix(in hsl, transparent 0%, currentColor 100%)" stroke="color-mix(in hsl, transparent 0%, currentColor 100%)" stroke-width="50"/>
+    </svg>

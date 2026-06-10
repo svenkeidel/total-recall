@@ -1,0 +1,27 @@
+<svg>
+  <script>function s1() { total += 20; return s2(); }</script>
+  <g>
+    <script>function s2() { return s3(); }</script>
+    <circle id="spot"><clipPath id="spot-first-child"/>
+      <script>function s3() { return s4(); }</script>
+    </circle>
+  </g>
+  <desc>
+    <script>function s4() { return s5(); }</script>
+  </desc>
+  <filter>
+    <script>function s5() { return s6(); }</script>
+    <feFlood>
+      <script>function s6() { return s7(); }</script>
+    </feFlood>
+  </filter>
+  <text>
+    <script>function s7() { return s8(); }</script>
+    <tspan>
+      <script>function s8() { return s9(); }</script>
+    </tspan>
+  </text>
+  <use href="spot">
+    <script>function s9() { return s10(); }</script>
+  </use>
+</svg>

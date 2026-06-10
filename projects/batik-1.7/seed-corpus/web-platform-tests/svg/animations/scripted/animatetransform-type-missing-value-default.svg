@@ -1,0 +1,18 @@
+<svg height="10">
+  <rect width="10" height="10" fill="blue">
+    <animateTransform attributeName="transform" type="translate"
+                      fill="freeze" dur="1s" from="10 0" to="10 0"/>
+  </rect>
+  <rect width="10" height="10" fill="blue">
+    <animateTransform attributeName="transform"
+                      fill="freeze" dur="1s" from="30 0" to="30 0"/>
+  </rect>
+  <rect width="10" height="10" fill="blue">
+    <animateTransform attributeName="transform" type="foo"
+                      fill="freeze" dur="1s" from="50 0" to="50 0"/>
+  </rect>
+  <rect width="10" height="10" fill="blue">
+    <animateTransform attributeName="transform" type="foo"
+                      fill="freeze" dur="1s" from="70 0" to="70 0"/>
+  </rect>
+</svg>

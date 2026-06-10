@@ -1,0 +1,5 @@
+  <svg width="300" height="300" viewBox="0 0 300 300"
+       xmlns:xlink="http://www.w3.org/1999/xlink">
+    <image href="/images/green.png" xlink:href="/images/red.png"
+           width="100px" height="100px"/>
+  </svg>

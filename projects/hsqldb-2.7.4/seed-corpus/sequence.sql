@@ -1,0 +1,4 @@
+CREATE SEQUENCE uid START WITH 1;
+SELECT uid.nextval;
+SELECT uid.nextval;
+DROP SEQUENCE uid;

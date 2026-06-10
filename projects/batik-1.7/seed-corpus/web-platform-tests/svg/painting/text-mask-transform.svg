@@ -1,0 +1,11 @@
+<svg style="background: green" width="200" height="200" viewBox="0 0 150 150">
+  <defs>
+    <mask id="mask">
+      <text fill="white">
+        <tspan x="120" y="25">A</tspan>
+        <tspan x="8" y="140">B</tspan>
+      </text>
+    </mask>
+  </defs>
+  <rect style="will-change: transform; mask: url(#mask)" fill="red" x="0" y="0" width="200" height="200">
+</svg>

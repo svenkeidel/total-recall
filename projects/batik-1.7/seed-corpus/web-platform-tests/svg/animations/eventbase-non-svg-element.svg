@@ -1,0 +1,5 @@
+<svg>
+  <rect height="100" width="100" fill="red">
+    <set attributeName="fill" begin="e.test" to="green"/>
+  </rect>
+</svg>
