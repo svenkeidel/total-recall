@@ -108,9 +108,9 @@ RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-0
     git reset --hard ${DOOP_REVISION} && \
     ./gradlew installDist
 
-## install JCG (08.06.2026)
+## install JCG (11.06.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_REVISION="dac4689c0457ef1fbd45c702def68cb1313fa0b2"
+ARG JCG_REVISION="f0a9ac62316beb783fc5fbec237ec7c9a773a0a1"
 ARG JCG_DIR="/home/$USER/JCG"
 RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \
