@@ -44,23 +44,31 @@ RUN mkdir -p ${JDK_DIR} && \
     wget https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u342-b07/OpenJDK8U-jdk_x64_linux_hotspot_8u342b07.tar.gz && \
     sudo tar xvf $JDK_DIR/OpenJDK8U-jdk_x64_linux_hotspot_8u342b07.tar.gz -C /opt
 
+RUN cd ${JDK_DIR} && \
+    wget https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.3%2B9/OpenJDK25U-jdk_x64_linux_hotspot_25.0.3_9.tar.gz && \
+    sudo tar xvf $JDK_DIR/OpenJDK25U-jdk_x64_linux_hotspot_25.0.3_9.tar.gz -C /opt
+ENV JDK25=/opt/jdk-25.0.3+9/
+
 # Install OpenJDK 26
 RUN cd ${JDK_DIR} && \
     wget https://github.com/adoptium/temurin26-binaries/releases/download/jdk-26%2B35/OpenJDK26U-jdk_x64_linux_hotspot_26_35.tar.gz && \
     sudo tar xvf $JDK_DIR/OpenJDK26U-jdk_x64_linux_hotspot_26_35.tar.gz -C /opt
+ENV JDK26=/opt/jdk-26+35/
 
-# Make OpenJDK 26 the default and use it for building \
-RUN sudo update-alternatives --install /usr/bin/java java /opt/jdk-26+35/bin/java 1000 && \
-    sudo update-alternatives --install /usr/bin/javac javac /opt/jdk-26+35/bin/javac 1000 && \
-    sudo update-alternatives --install /usr/bin/jar jar /opt/jdk-26+35/bin/jar 1000
-ENV JAVA_HOME="/opt/jdk-26+35/"
+# Make OpenJDK 25 the default and use it for building \
+RUN sudo update-alternatives --install /usr/bin/java java $JDK25/bin/java 1000 && \
+    sudo update-alternatives --install /usr/bin/javac javac $JDK25/bin/javac 1000 && \
+    sudo update-alternatives --install /usr/bin/jar jar $JDK25/bin/jar 1000
+ENV JAVA_HOME="${JDK25}"
 
 # Repackage jdk/lib/modules as jdk/lib/rt.jar (needed by Doop).
-RUN sudo mkdir /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/jar-extracted && \
-    sudo /opt/jdk-26+35/bin/jimage extract --dir /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/modules && \
-    sudo cp -r /opt/jdk-26+35/lib/modules-extracted/*.* /opt/jdk-26+35/lib/jar-extracted/ && \
-    sudo /opt/jdk-26+35/bin/jar cvf /opt/jdk-26+35/lib/rt.jar -C /opt/jdk-26+35/lib/jar-extracted/ . && \
-    sudo rm -rf /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/jar-extracted
+RUN for JDK in $JDK25 $JDK26; do \
+      sudo mkdir $JDK/lib/modules-extracted $JDK/lib/jar-extracted && \
+      sudo $JDK/bin/jimage extract --dir $JDK/lib/modules-extracted $JDK/lib/modules && \
+      sudo cp -r $JDK/lib/modules-extracted/*.* $JDK/lib/jar-extracted/ && \
+      sudo $JDK/bin/jar cvf $JDK/lib/rt.jar -C $JDK/lib/jar-extracted/ . && \
+      sudo rm -rf $JDK/lib/modules-extracted $JDK/lib/jar-extracted; \
+    done
 
 ## install sbt
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list && \
@@ -124,7 +132,7 @@ RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01
     cd $JCG_DIR && \
     git checkout ${JCG_BRANCH} && \
     git reset --hard ${JCG_REVISION} && \
-    sbt -java-home /opt/jdk-26+35/ compile
+    sbt -java-home $JDK25 compile
 
 # Install OpenJDK 8 version 342
 COPY jre.conf $JCG_DIR/jre.conf

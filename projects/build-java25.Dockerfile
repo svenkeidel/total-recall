@@ -5,7 +5,7 @@ COPY --chown=JCG:users repo/ /repo
 COPY --from=jazzer-input-parser /build/JazzerInputParser.jar /repo/
 COPY --from=jazzer-input-parser /build/libJazzerInputParser.so /repo/
 
-ENV JDK=/opt/jdk-26+35/
+ENV JDK=/opt/jdk-25.0.3+9/
 
 # Compile entrypoint
 RUN --mount=type=bind,src=src/,target=src/ \

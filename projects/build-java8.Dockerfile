@@ -1,23 +1,23 @@
 # syntax = docker/dockerfile:latest
-FROM maven:3-openjdk-17 AS builder
+FROM jcg AS builder
 
-RUN microdnf install unzip
-
-COPY repo/ /repo
+COPY --chown=JCG:users repo/ /repo
 COPY --from=jazzer-input-parser /build/JazzerInputParser.jar /repo/
 COPY --from=jazzer-input-parser /build/libJazzerInputParser.so /repo/
 
+ENV JDK=/opt/jdk8u342-b07
+
 # Compile entrypoint
 RUN --mount=type=bind,src=src/,target=src/ \
-    javac -source 8 -target 8 -cp "/repo/*" -d target src/Entrypoint.java && \
-    jar cf /repo/entrypoint.jar -C target . && \
+    $JDK/bin/javac -source 8 -target 8 -cp "/repo/*" -d target src/Entrypoint.java && \
+    $JDK/bin/jar cf /repo/entrypoint.jar -C target . && \
     rm -rf target/*
 
 # Compile fuzzer and package in a jar
 RUN --mount=type=bind,src=src/,target=src/ \
     --mount=type=bind,src=target/jazzer-api.jar,target=lib/jazzer-api.jar \
-    javac -source 8 -target 8 -cp "/repo/*:lib/jazzer-api.jar" -d target src/*Fuzzer.java && \
-    jar cf /repo/fuzzer.jar -C target . && \
+    $JDK/bin/javac -source 8 -target 8 -cp "/repo/*:lib/jazzer-api.jar" -d target src/*Fuzzer.java && \
+    $JDK/bin/jar cf /repo/fuzzer.jar -C target . && \
     rm -rf target/*
 
 RUN --mount=type=bind,src=target/adjust_line_numbers_to_pc.jar,target=lib/adjust_line_numbers_to_pc.jar \
