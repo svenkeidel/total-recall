@@ -37,6 +37,7 @@ RUN sudo apt-get -y autoremove openjdk* && \
     sudo apt-get -y purge openjdk*
 
 ARG JDK_DIR="/home/${USER}/jdk"
+
 # Install OpenJDK 8 version 342
 RUN mkdir -p ${JDK_DIR} && \
     cd ${JDK_DIR} && \
@@ -53,6 +54,13 @@ RUN sudo update-alternatives --install /usr/bin/java java /opt/jdk-26+35/bin/jav
     sudo update-alternatives --install /usr/bin/javac javac /opt/jdk-26+35/bin/javac 1000 && \
     sudo update-alternatives --install /usr/bin/jar jar /opt/jdk-26+35/bin/jar 1000
 ENV JAVA_HOME="/opt/jdk-26+35/"
+
+# Repackage jdk/lib/modules as jdk/lib/rt.jar (needed by Doop).
+RUN sudo mkdir /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/jar-extracted && \
+    sudo /opt/jdk-26+35/bin/jimage extract --dir /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/modules && \
+    sudo cp -r /opt/jdk-26+35/lib/modules-extracted/*.* /opt/jdk-26+35/lib/jar-extracted/ && \
+    sudo /opt/jdk-26+35/bin/jar cvf /opt/jdk-26+35/lib/rt.jar -C /opt/jdk-26+35/lib/jar-extracted/ . && \
+    sudo rm -rf /opt/jdk-26+35/lib/modules-extracted /opt/jdk-26+35/lib/jar-extracted
 
 ## install sbt
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list && \
@@ -110,7 +118,7 @@ RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-0
 
 ## install JCG (11.06.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_REVISION="f0a9ac62316beb783fc5fbec237ec7c9a773a0a1"
+ARG JCG_REVISION="768a167dc79dbeb9c60ca34c1e0fc2cc1189268e"
 ARG JCG_DIR="/home/$USER/JCG"
 RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \
