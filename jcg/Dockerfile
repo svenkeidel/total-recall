@@ -65,7 +65,7 @@ ENV JAVA_HOME="${JDK25}"
 RUN for JDK in $JDK25 $JDK26; do \
       sudo mkdir $JDK/lib/modules-extracted $JDK/lib/jar-extracted && \
       sudo $JDK/bin/jimage extract --dir $JDK/lib/modules-extracted $JDK/lib/modules && \
-      sudo cp -r $JDK/lib/modules-extracted/*.* $JDK/lib/jar-extracted/ && \
+      sudo cp -r $JDK/lib/modules-extracted/*/* $JDK/lib/jar-extracted/ && \
       sudo $JDK/bin/jar cvf $JDK/lib/rt.jar -C $JDK/lib/jar-extracted/ . && \
       sudo rm -rf $JDK/lib/modules-extracted $JDK/lib/jar-extracted; \
     done
