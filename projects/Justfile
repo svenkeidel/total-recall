@@ -178,12 +178,13 @@ coverage_report EXPERIMENT COVERAGE_DIR EXCLUDE_CLASSES:
 
 [private]
 dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPERIMENT)
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
+    mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
     docker run -it \
       --name {{DYNCG_CONTAINER}} \
       --memory={{DYNCG_MEMORY}} \
+      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
@@ -203,6 +204,7 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPE
       --language java \
       --compress \
       --debug
+    rm -rf {{TARGET_PATH}}/tmp
 
 dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
 
@@ -220,6 +222,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
       --name {{COMPARECG_CONTAINER}} \
       --memory={{COMPARECG_MEMORY}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
@@ -276,20 +279,21 @@ VALUECG_DIR := "/home/JCG/valuecg"
 VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
-    mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
+    mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
     docker rm -f {{STATICCG_CONTAINER}}
     docker run -it \
       --name {{STATICCG_CONTAINER}} \
       --env VALUECG_RUNNER_DIR={{VALUECG_DIR}} \
       --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
-      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
-      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg_conf,target={{VALUECG_CONFIG_DIR}} \
+      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg,target=/staticcg \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt,target=/log.txt \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
+      --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg_conf,target={{VALUECG_CONFIG_DIR}} \
       {{JCG_IMAGE}} \
       {{STATICCG_TIMEOUT}} \
       {{STATICCG_MEMORY}} \
@@ -302,6 +306,7 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --language java \
       --compress \
       --debug
+    rm -rf {{TARGET_PATH}}/tmp
 
 [private]
 doop_callgraphs: (static_callgraph "Doop" "0-CFA") (static_callgraph "Doop" "1-CFA") (static_callgraph "Doop" "1-CFA+HEAP") (static_callgraph "Doop" "1OBJ-CFA") (static_callgraph "Doop" "1TYP-CFA") (static_callgraph "Doop" "1TYP-CFA+HEAP") (static_callgraph "Doop" "1OBJ-1TYP-CFA+HEAP")
