@@ -112,7 +112,7 @@ fuzz EXPERIMENT: (prepare_corpus EXPERIMENT) build_project build_jazzer_image &&
 
     # Run fuzzer
     docker rm -f {{FUZZING_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
            --name {{FUZZING_CONTAINER}} \
            --mount type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
            --mount type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
@@ -139,7 +139,7 @@ coverage EXPERIMENT: build_jazzer_image build_project (prepare_corpus EXPERIMENT
 
     # record coverage
     docker rm -f {{COVERAGE_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
                --name {{COVERAGE_CONTAINER}} \
                --mount type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
                --mount type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
@@ -181,7 +181,7 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPE
     mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
       --name {{DYNCG_CONTAINER}} \
       --memory={{DYNCG_MEMORY}} \
       --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
@@ -218,7 +218,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         exit 0; \
     fi
     docker rm -f {{COMPARECG_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
       --memory={{COMPARECG_MEMORY}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
@@ -238,7 +238,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         --truth-callgraph-directory /dynamiccg \
         --comparison-name all
     docker rm -f {{COMPARECG_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
@@ -282,7 +282,7 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
     mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
     docker rm -f {{STATICCG_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
       --name {{STATICCG_CONTAINER}} \
       --env VALUECG_RUNNER_DIR={{VALUECG_DIR}} \
       --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
@@ -327,7 +327,7 @@ static_callgraphs: doop_callgraphs opal_callgraphs soot_callgraphs sootup_callgr
 
 jdk_callbacks: build_jcg_image
     docker rm -f {{JDK_CALLBACKS_CONTAINER}}
-    docker run -it \
+    docker run -it --rm \
       --name {{JDK_CALLBACKS_CONTAINER}} \
       --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
       --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg_conf,target={{VALUECG_CONFIG_DIR}} \
