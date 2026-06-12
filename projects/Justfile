@@ -256,7 +256,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         --edge-include ".*L$COMPARE_PACKAGE.*"
 
 [private]
-compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "context-insensitive")
+compare_doop: (compare_callgraph "Doop" "0-CFA") (compare_callgraph "Doop" "1-CFA") (compare_callgraph "Doop" "1-CFA+HEAP") (compare_callgraph "Doop" "1OBJ-CFA") (compare_callgraph "Doop" "1TYP-CFA") (compare_callgraph "Doop" "1TYP-CFA+HEAP") (compare_callgraph "Doop" "1OBJ-1TYP-CFA+HEAP")
 [private]
 compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph "fuzzing_seed" "OPAL" "RTA") (compare_callgraph "fuzzing_seed" "OPAL" "CTA") (compare_callgraph "fuzzing_seed" "OPAL" "FTA") (compare_callgraph "fuzzing_seed" "OPAL" "XTA") (compare_callgraph "fuzzing_seed" "OPAL" "0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "0-1-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-1-CFA")
 [private]
@@ -304,7 +304,7 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --debug
 
 [private]
-doop_callgraphs: (static_callgraph "Doop" "context-insensitive")
+doop_callgraphs: (static_callgraph "Doop" "0-CFA") (static_callgraph "Doop" "1-CFA") (static_callgraph "Doop" "1-CFA+HEAP") (static_callgraph "Doop" "1OBJ-CFA") (static_callgraph "Doop" "1TYP-CFA") (static_callgraph "Doop" "1TYP-CFA+HEAP") (static_callgraph "Doop" "1OBJ-1TYP-CFA+HEAP")
 [private]
 opal_callgraphs: (static_callgraph "OPAL" "CHA") (static_callgraph "OPAL" "RTA") (static_callgraph "OPAL" "MTA") (static_callgraph "OPAL" "CTA") (static_callgraph "OPAL" "FTA") (static_callgraph "OPAL" "XTA") (static_callgraph "OPAL" "0-CFA") (static_callgraph "OPAL" "0-1-CFA") (static_callgraph "OPAL" "1-0-CFA") (static_callgraph "OPAL" "1-1-CFA")
 [private]

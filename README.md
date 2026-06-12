@@ -39,7 +39,7 @@ To achieve a good quality of the dynamic baseline, the pipeline provides differe
 
 The pipeline evaluates the following fixed set of static callgraphs: 
 
-* **Doop**: 0-CFA
+* **Doop**: 0-CFA, 1-CFA, 1-CFA+HEAP, 1OBJ-CFA, 1OBJ-CFA+HEAP, 1TYP-CFA, 1TYP-CFA+HEAP, 1OBJ-1TYP-CFA+HEAP 
 * **OPAL**: CHA, RTA, CTA, FTA, XTA, 0-CFA, 0-1-CFA, 1-0-CFA, 1-1-CFA
 * **Soot**: CHA, RTA, VTA, SPARK
 * **SootUp**: CHA, RTA, 0-CFA, 1-CFA
