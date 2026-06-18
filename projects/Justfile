@@ -178,13 +178,12 @@ coverage_report EXPERIMENT COVERAGE_DIR EXCLUDE_CLASSES:
 
 [private]
 dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPERIMENT)
-    mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
+    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
     docker run -it --rm \
       --name {{DYNCG_CONTAINER}} \
       --memory={{DYNCG_MEMORY}} \
-      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
