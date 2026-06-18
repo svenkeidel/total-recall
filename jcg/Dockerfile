@@ -126,9 +126,9 @@ RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-0
     ./gradlew installDist && \
     sed -i '/DEFAULT_JVM_OPTS/d' build/install/doop/bin/doop # Allows setting DEFAULT_JVM_OPTS from JCG adapter
 
-## install JCG (16.06.2026)
+## install JCG (18.06.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_REVISION="29a19df7cf65cb5ac0e3835bb0453c05a34749cf"
+ARG JCG_REVISION="aac7b1173ba07e411c9df53390b40d892f5f3501"
 ARG JCG_DIR="/home/$USER/JCG"
 RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \

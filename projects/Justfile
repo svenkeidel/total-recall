@@ -265,7 +265,7 @@ compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph
 [private]
 compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA") (compare_callgraph "fuzzing_seed" "Soot" "RTA") (compare_callgraph "fuzzing_seed" "Soot" "VTA") (compare_callgraph "fuzzing_seed" "Soot" "SPARK")
 [private]
-compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "RTA") (compare_callgraph "fuzzing_seed" "SootUp" "0-CFA") (compare_callgraph "fuzzing_seed" "SootUp" "1-CFA")
+compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "RTA")
 [private]
 compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "Taie" "PTA")
 [private]
@@ -315,7 +315,7 @@ opal_callgraphs: (static_callgraph "OPAL" "CHA") (static_callgraph "OPAL" "RTA")
 [private]
 soot_callgraphs: (static_callgraph "Soot" "CHA") (static_callgraph "Soot" "RTA") (static_callgraph "Soot" "VTA") (static_callgraph "Soot" "SPARK")
 [private]
-sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" "RTA") (static_callgraph "SootUp" "0-CFA") (static_callgraph "SootUp" "1-CFA")
+sootup_callgraphs: (static_callgraph "SootUp" "CHA") (static_callgraph "SootUp" "RTA")
 [private]
 taie_callgraphs: (static_callgraph "Taie" "CHA") (static_callgraph "Taie" "PTA")
 [private]

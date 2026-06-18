@@ -42,7 +42,7 @@ The pipeline evaluates the following fixed set of static callgraphs:
 * **Doop**: 0-CFA, 1-CFA, 1-CFA+HEAP, 1OBJ-CFA, 1OBJ-CFA+HEAP, 1TYP-CFA, 1TYP-CFA+HEAP, 1OBJ-1TYP-CFA+HEAP 
 * **OPAL**: CHA, RTA, CTA, FTA, XTA, 0-CFA, 0-1-CFA, 1-0-CFA, 1-1-CFA
 * **Soot**: CHA, RTA, VTA, SPARK
-* **SootUp**: CHA, RTA, 0-CFA, 1-CFA
+* **SootUp**: CHA, RTA
 * **Tai-E**: CHA, PTA
 * **ValueCG**: fast, precise
 * **WALA**: CHA, RTA, 0-CFA, 1-CFA, 0-1-CFA
