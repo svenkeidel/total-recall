@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="commons-logging-1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/axion-1.0-M2/repo/commons-logging-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

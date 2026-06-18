@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="batik-parser">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/batik-1.7/repo/batik-parser.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
