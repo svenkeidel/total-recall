@@ -9,44 +9,47 @@ import org.apache.batik.apps.rasterizer.SVGConverter;
 import org.apache.batik.apps.rasterizer.DestinationType;
 
 public class Entrypoint {
-    public static void entrypoint(Path svg) throws Exception {
-        File dst = Files.createTempDirectory("output").toFile();
+    public static void entrypoint(Path svg) {
         try {
-            SVGConverter converter = new SVGConverter();
-            converter.setSources(new String[]{svg.toAbsolutePath().toString()});
-            converter.setDst(dst);
-
+            File dst = Files.createTempDirectory("output").toFile();
             try {
-                converter.execute();
-            } catch(Exception exc) {
-                exc.printStackTrace(System.err);
-            }
+                SVGConverter converter = new SVGConverter();
+                converter.setSources(new String[]{svg.toAbsolutePath().toString()});
+                converter.setDst(dst);
 
-            try {
-                converter.setDestinationType(DestinationType.JPEG);
-                converter.execute();
-            } catch(Exception exc) {
-                exc.printStackTrace(System.err);
-            }
+                try {
+                    converter.execute();
+                } catch(Exception exc) {
+                    exc.printStackTrace(System.err);
+                }
 
-            try {
-                converter.setDestinationType(DestinationType.TIFF);
-                converter.execute();
-            } catch(Exception exc) {
-                exc.printStackTrace(System.err);
-            }
+                try {
+                    converter.setDestinationType(DestinationType.JPEG);
+                    converter.execute();
+                } catch(Exception exc) {
+                    exc.printStackTrace(System.err);
+                }
 
-            try {
-                converter.setDestinationType(DestinationType.PDF);
-                converter.execute();
-            } catch(Exception exc) {
+                try {
+                    converter.setDestinationType(DestinationType.TIFF);
+                    converter.execute();
+                } catch(Exception exc) {
+                    exc.printStackTrace(System.err);
+                }
+
+                try {
+                    converter.setDestinationType(DestinationType.PDF);
+                    converter.execute();
+                } catch(Exception exc) {
+                    exc.printStackTrace(System.err);
+                }
+            } catch (Throwable exc) {
                 exc.printStackTrace(System.err);
+            } finally {
+                deleteDirectory(dst);
             }
         } catch (Throwable exc) {
-            // Ignore exceptions
             exc.printStackTrace(System.err);
-        } finally {
-            deleteDirectory(dst);
         }
     }
 

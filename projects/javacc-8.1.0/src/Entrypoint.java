@@ -12,19 +12,23 @@ public class Entrypoint {
      * 
      * @param grammarPath The grammar file to be processed.
      */
-    public static void entrypoint(Path grammarPath) throws IOException {
-
-        Path output = Files.createTempDirectory("javacc");
-        Path documentation = output.resolve("documentation.html");
+    public static void entrypoint(Path grammarPath) {
 
         try {
-            String grammar = grammarPath.toAbsolutePath().toString();
-            org.javacc.parser.Main.mainProgram(new String[] { "-OUTPUT_DIRECTORY="+output.toAbsolutePath().toString(), grammar});
-            org.javacc.jjdoc.JJDocMain.mainProgram(new String[]{ "-OUTPUT_FILE="+documentation.toAbsolutePath().toString(), grammar});
-        } catch(Throwable t) {
-            t.printStackTrace(); 
-        } finally {
-            deleteDirectory(output.toFile());
+            Path output = Files.createTempDirectory("javacc");
+            Path documentation = output.resolve("documentation.html");
+
+            try {
+                String grammar = grammarPath.toAbsolutePath().toString();
+                org.javacc.parser.Main.mainProgram(new String[]{"-OUTPUT_DIRECTORY=" + output.toAbsolutePath().toString(), grammar});
+                org.javacc.jjdoc.JJDocMain.mainProgram(new String[]{"-OUTPUT_FILE=" + documentation.toAbsolutePath().toString(), grammar});
+            } catch (Throwable exc) {
+                exc.printStackTrace();
+            } finally {
+                deleteDirectory(output.toFile());
+            }
+        } catch (Throwable exc) {
+            exc.printStackTrace();
         }
     }
 

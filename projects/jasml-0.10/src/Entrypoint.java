@@ -9,19 +9,22 @@ import com.jasml.decompiler.JavaClassParser;
 import com.jasml.decompiler.SourceCodeBuilder;
 
 public class Entrypoint {
-    public static void entrypoint(Path input) throws Exception {
-        Path dumpedByteCode = Files.createTempFile("fuzzing", "dumpedByteCode");
+    public static void entrypoint(Path input) {
         try {
-            JavaClassParser parser = new JavaClassParser();
-            JavaClass clazz = parser.parseClass(input.toFile());
-            String textualJVMByteCode = new SourceCodeBuilder().toString(clazz);
-            JavaClass parsedClazz = new SourceCodeParser(textualJVMByteCode).parse();
-            new JavaClassDumpper(parsedClazz, dumpedByteCode.toFile()).dump();
+            Path dumpedByteCode = Files.createTempFile("fuzzing", "dumpedByteCode");
+            try {
+                JavaClassParser parser = new JavaClassParser();
+                JavaClass clazz = parser.parseClass(input.toFile());
+                String textualJVMByteCode = new SourceCodeBuilder().toString(clazz);
+                JavaClass parsedClazz = new SourceCodeParser(textualJVMByteCode).parse();
+                new JavaClassDumpper(parsedClazz, dumpedByteCode.toFile()).dump();
+            } catch (Throwable exc) {
+                exc.printStackTrace(System.err);
+            } finally {
+                Files.delete(dumpedByteCode);
+            }
         } catch (Throwable exc) {
-            // Ignore exceptions
             exc.printStackTrace(System.err);
-        } finally {
-            Files.delete(dumpedByteCode);
         }
     }
     public static void recurseDirectories(Path path) throws Exception {

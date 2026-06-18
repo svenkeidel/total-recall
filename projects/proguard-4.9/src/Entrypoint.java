@@ -7,41 +7,45 @@ import java.util.ArrayList;
 import proguard.*;
 
 class Entrypoint {
-    public static void entrypoint(Path inputJar) throws Exception {
-        Path jdk = Paths.get("/resources/rt.jar");
-
-        Path result = Files.createTempDirectory("result");
-        Path outputJar = result.resolve("output.jar");
-
+    public static void entrypoint(Path inputJar) {
         try {
-            Configuration configuration = new Configuration();
-            ConfigurationParser parser = new ConfigurationParser(new String[] {
-                    "-injars", inputJar.toString(),
-                    "-outjars", outputJar.toString(),
-                    "-libraryjars", jdk.toString()+"(!**.jar;!module-info.class)",
-                    "-optimizationpasses", "5",
-                    "-overloadaggressively",
-                    "-allowaccessmodification",
-                    "-mergeinterfacesaggressively",
-                    "-useuniqueclassmembernames",
-                    "-repackageclasses", "''",
-                    "-keep", "public", "class", "Entrypoint",
-                    "-keepattributes", "SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,Deprecated,Annotation",
-                    "-dontskipnonpubliclibraryclasses",
-                    "-dontskipnonpubliclibraryclassmembers"
-                },
-                System.getProperties());
-            try {
-                parser.parse(configuration);
-            } finally {
-                parser.close();
-            }
+            Path jdk = Paths.get("/resources/rt.jar");
 
-            new ProGuard(configuration).execute();
+            Path result = Files.createTempDirectory("result");
+            Path outputJar = result.resolve("output.jar");
+
+            try {
+                Configuration configuration = new Configuration();
+                ConfigurationParser parser = new ConfigurationParser(new String[]{
+                        "-injars", inputJar.toString(),
+                        "-outjars", outputJar.toString(),
+                        "-libraryjars", jdk.toString() + "(!**.jar;!module-info.class)",
+                        "-optimizationpasses", "5",
+                        "-overloadaggressively",
+                        "-allowaccessmodification",
+                        "-mergeinterfacesaggressively",
+                        "-useuniqueclassmembernames",
+                        "-repackageclasses", "''",
+                        "-keep", "public", "class", "Entrypoint",
+                        "-keepattributes", "SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,Deprecated,Annotation",
+                        "-dontskipnonpubliclibraryclasses",
+                        "-dontskipnonpubliclibraryclassmembers"
+                },
+                        System.getProperties());
+                try {
+                    parser.parse(configuration);
+                } finally {
+                    parser.close();
+                }
+
+                new ProGuard(configuration).execute();
+            } catch (Throwable exc) {
+                exc.printStackTrace(System.err);
+            } finally {
+                deleteDirectory(result.toFile());
+            }
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
-        } finally {
-            deleteDirectory(result.toFile());
         }
     }
 

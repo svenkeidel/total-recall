@@ -13,24 +13,28 @@ import java.sql.DriverManager;
 import org.hsqldb.cmdline.SqlFile;
 
 public class Entrypoint {
-    public static void entrypoint(Path input) throws Exception {
-        // Create a temporary directory for the database.
-        Path db = Files.createTempDirectory("fuzzing");
-
+    public static void entrypoint(Path input) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:hsqldb:file:" + db.toString() + "/testdb", "SA", "");
+            // Create a temporary directory for the database.
+            Path db = Files.createTempDirectory("fuzzing");
 
-            SqlFile sqlFile = new SqlFile(input.toFile());
-            Map<String, String> userVars = new HashMap<>();
-            userVars.put("*SCRIPT_DIR", input.getParent().toString());
-            sqlFile.addUserVars(userVars);
-            sqlFile.setConnection(conn);
-            sqlFile.execute();
+            try {
+                Connection conn = DriverManager.getConnection("jdbc:hsqldb:file:" + db.toString() + "/testdb", "SA", "");
+
+                SqlFile sqlFile = new SqlFile(input.toFile());
+                Map<String, String> userVars = new HashMap<>();
+                userVars.put("*SCRIPT_DIR", input.getParent().toString());
+                sqlFile.addUserVars(userVars);
+                sqlFile.setConnection(conn);
+                sqlFile.execute();
+            } catch (Throwable exc) {
+                exc.printStackTrace(System.err);
+            } finally {
+                // Clean up the temporary files and directory
+                deleteDirectory(db.toFile());
+            }
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
-        } finally {
-            // Clean up the temporary files and directory
-            deleteDirectory(db.toFile());
         }
     }
 
