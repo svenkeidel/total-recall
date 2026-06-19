@@ -3,3 +3,4 @@ coverage.txt
 **/target/
 jcg/valuecg
 jcg/valuecg_conf
+__pycache__
