@@ -133,7 +133,7 @@ fuzz EXPERIMENT: (prepare_corpus EXPERIMENT) build_project build_jazzer_image &&
            corpus
 
 [private]
-coverage EXPERIMENT: build_jazzer_image build_project (prepare_corpus EXPERIMENT) && (coverage_report EXPERIMENT "coverage" "false")
+coverage EXPERIMENT: build_project (prepare_corpus EXPERIMENT) && (coverage_report EXPERIMENT "coverage" "false")
     mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/coverage {{PROJECT_PATH}}/resources
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/coverage/coverage.exec
 
