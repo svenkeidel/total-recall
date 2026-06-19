@@ -4,3 +4,5 @@ coverage.txt
 jcg/valuecg
 jcg/valuecg_conf
 __pycache__
+projects/xerces-2.10.0/resources
+projects/xerces-2.12.2/resources
