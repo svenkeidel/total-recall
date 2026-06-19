@@ -8,13 +8,11 @@ import org.javacc.parser.Main;
 import org.javacc.jjdoc.JJDocMain;
 
 public class Entrypoint {
-  /**
-     * 
-     * @param grammarPath The grammar file to be processed.
-     */
+
+    private static Path output;
+
     public static void entrypoint(Path grammarPath) {
         try {
-            Path output = Files.createTempDirectory("javacc");
             Path documentation = output.resolve("documentation.html");
 
             try {
@@ -24,33 +22,31 @@ public class Entrypoint {
             } catch(Throwable t) {
                 t.printStackTrace();
             } finally {
-                deleteDirectory(output.toFile());
+                deleteDirectoryContents(output.toFile(), true);
             }
         } catch(Throwable exc) {
             exc.printStackTrace();
         }
-
     }
 
-    public static void recurseDirectories(Path path) throws Exception {
-        try(Stream<Path> files = Files.walk(path)) {
+    public static void deleteDirectoryContents(File directoryToBeDeleted, Boolean root) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectoryContents(file, false);
+            }
+        }
+        if(! root) {
+            directoryToBeDeleted.delete();
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
+        Entrypoint.output = Files.createTempDirectory("javacc");
+        try(Stream<Path> files = Files.walk(Paths.get(args[0]))) {
             for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
                 Entrypoint.entrypoint(inputFile);
             }
         }
-    }
-
-    public static boolean deleteDirectory(File directoryToBeDeleted) {
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
-            }
-        }
-        return directoryToBeDeleted.delete();
-    }
-
-    public static void main(String args[]) throws Exception {
-        recurseDirectories(Paths.get(args[0]));
     }
 }

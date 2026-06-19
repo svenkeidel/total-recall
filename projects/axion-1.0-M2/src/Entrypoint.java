@@ -10,16 +10,15 @@ import jazzer.InputParser;
 import org.axiondb.tools.Console;
 
 public class Entrypoint {
+
+    private static Path db;
+
     public static void entrypoint(String input) throws Exception {
-        //  - Creates a temporary directory and log file for the database.
-        Path db = Files.createTempDirectory("fuzzing");
         Path logFile = db.resolve("log.txt");
         PrintWriter logWriter = new PrintWriter(logFile.toFile());
         Console console = null;
         try {
-            console = new Console("fuzzingdb", db.toString(), logWriter);
-//            createInitialTables(console.getConnection());
-//Tokenizes the input string by splitting it on the `;` character to handle multiple SQL commands.
+            console = new Console("db", db.toString(), logWriter);
             StringTokenizer tokenizer = new StringTokenizer(input, ";", false);
             while(tokenizer.hasMoreTokens()) {
                 String sql = tokenizer.nextToken().replace("\n", "");
@@ -27,42 +26,36 @@ public class Entrypoint {
                     //Tokenizes the input string by splitting it on the `;` character to handle multiple SQL commands.
                     console.execute(sql);
                 } catch (Throwable exc) {
-                    // Ignore exceptions
                     exc.printStackTrace(System.err);
                 }
             }
         } catch (Throwable exc) {
-            // Ignore exceptions
             exc.printStackTrace(System.err);
         } finally {
-            //Tokenizes the input string by splitting it on the `;` character to handle multiple SQL commands.
             console.cleanUp();
-            deleteDirectory(db.toFile());
+            deleteDirectoryContents(db.toFile(), true);
         }
     }
 
-    public static void recurseDirectories(Path path) throws Exception {
-        try(Stream<Path> files = Files.walk(path)) {
-            for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
-                String input = InputParser.parseString(Files.readAllBytes(inputFile));
-                // Reads the contents of each file, parses it into a string, and passes it to the `entrypoint` method for execution.
-                Entrypoint.entrypoint(input);
-            }
-        }
-    }
-
-    public static boolean deleteDirectory(File directoryToBeDeleted) {
+    public static void deleteDirectoryContents(File directoryToBeDeleted, Boolean root) {
         File[] allContents = directoryToBeDeleted.listFiles();
         if (allContents != null) {
             for (File file : allContents) {
-                deleteDirectory(file);
+                deleteDirectoryContents(file, false);
             }
         }
-        return directoryToBeDeleted.delete();
+        if(! root) {
+            directoryToBeDeleted.delete();
+        }
     }
 
     public static void main(String args[]) throws Exception {
-        //Calls `recurseDirectories` with the path provided as a command-line argument
-        recurseDirectories(Paths.get(args[0]));
+        Entrypoint.db = Files.createTempDirectory("db");
+        try(Stream<Path> files = Files.walk(Paths.get(args[0]))) {
+            for(Path inputFile: (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
+                String input = InputParser.parseString(Files.readAllBytes(inputFile));
+                Entrypoint.entrypoint(input);
+            }
+        }
     }
 }
