@@ -25,6 +25,8 @@ public class Entrypoint {
                     "-paging", String.valueOf(Integer.MAX_VALUE),
                     "-knn_vector", "3"
             });
+        } catch (Throwable exc) {
+            exc.printStackTrace(System.err);
         } finally {
             deleteDirectoryContents(index, true);
         }
@@ -43,7 +45,7 @@ public class Entrypoint {
     }
 
     public static void main(String args[]) throws Exception {
-        File index = Files.createTempDirectory("index").toFile();
+        Entrypoint.index = Files.createTempDirectory("index").toFile();
         try(Stream<Path> fileList = Files.list(Paths.get(args[0]))) {
             for(Path docsPath: (Iterable<Path>) fileList::iterator) {
                 Entrypoint.entrypoint(docsPath);
