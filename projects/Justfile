@@ -207,6 +207,30 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPE
 
 dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
 
+[private]
+dynamic_callgraph_add_declared_targets EXPERIMENT:
+    if [ ! -f {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz ]; then \
+        echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \
+        exit 0; \
+    fi
+    docker rm -f {{DYNCG_CONTAINER}}
+    docker run -it --rm \
+      --name {{DYNCG_CONTAINER}} \
+      --memory={{DYNCG_MEMORY}} \
+      --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg,target=/dyncg \
+      {{JCG_IMAGE}} \
+      {{DYNCG_TIMEOUT}} \
+      {{DYNCG_MEMORY}} \
+      runMain Commandline dynamic-callgraph-add-declared-targets \
+      --projects-directory /jcg-conf/ \
+      --call-graphs-directory /dyncg \
+      --project-prefix $PROJECT \
+      --language java
+
+dynamic_callgraph_add_declared_targets_fuzzing_seed: (dynamic_callgraph_add_declared_targets "fuzzing_seed")
+
 compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
     if [ ! -f {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz ]; then \
         echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \

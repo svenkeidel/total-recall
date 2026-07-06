@@ -41,6 +41,8 @@ coverage_fuzzing_seed: (for_all_projects "coverage_fuzzing_seed")
 # Record a dynamic call graph for a corpus created by fuzzing and an initial seed corpus
 dynamic_callgraph_fuzzing_seed: (for_all_projects "dynamic_callgraph_fuzzing_seed")
 
+dynamic_callgraph_add_declared_targets_fuzzing_seed: (for_all_projects "dynamic_callgraph_add_declared_targets_fuzzing_seed")
+
 static_callgraph FRAMEWORK ALGO: (for_all_projects "static_callgraph" FRAMEWORK ALGO)
 
 static_callgraphs: (for_all_projects "static_callgraphs")
