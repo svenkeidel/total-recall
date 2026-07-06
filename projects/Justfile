@@ -213,9 +213,9 @@ dynamic_callgraph_add_declared_targets EXPERIMENT:
         echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \
         exit 0; \
     fi
-    docker rm -f {{DYNCG_CONTAINER}}
+    docker rm -f {{DYNCG_CONTAINER}}-add-declared-targets
     docker run -it --rm \
-      --name {{DYNCG_CONTAINER}} \
+      --name {{DYNCG_CONTAINER}}-add-declared-targets \
       --memory={{DYNCG_MEMORY}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \

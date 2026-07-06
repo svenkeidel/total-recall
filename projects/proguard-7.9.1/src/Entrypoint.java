@@ -8,7 +8,7 @@ import proguard.*;
 
 public class Entrypoint {
 
-    Path result;
+    private static Path result;
     public static void entrypoint(Path inputJar) {
         Path jdk = Paths.get("/resources/jmods/");
 
