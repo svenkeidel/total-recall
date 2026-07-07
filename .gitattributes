@@ -2,3 +2,4 @@ fuzzing-corpora/sql/seed-corpus/sqlance-hsqldb-norec/** filter=lfs diff=lfs merg
 fuzzing-corpora/sql/seed-corpus/sqlance-hsqldb-where/** filter=lfs diff=lfs merge=lfs -text
 fuzzing-corpora/text/seed-corpus/** filter=lfs diff=lfs merge=lfs -text
 projects/lucene-10.4.0/resources/knn_dict/** filter=lfs diff=lfs merge=lfs -text
+projects/antlr-4.13.2/seed-corpus/** filter=lfs diff=lfs merge=lfs -text

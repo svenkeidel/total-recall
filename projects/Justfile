@@ -203,7 +203,6 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPE
       --language java \
       --compress \
       --debug
-    rm -rf {{TARGET_PATH}}/tmp
 
 dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
 
@@ -245,7 +244,6 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
       --name {{COMPARECG_CONTAINER}} \
       --memory={{COMPARECG_MEMORY}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
-      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
@@ -302,7 +300,7 @@ VALUECG_DIR := "/home/JCG/valuecg"
 VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
-    mkdir -p {{TARGET_PATH}}/tmp {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
+    mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
     docker rm -f {{STATICCG_CONTAINER}}
     docker run -it --rm \
