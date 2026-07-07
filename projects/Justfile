@@ -307,7 +307,6 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --name {{STATICCG_CONTAINER}} \
       --env VALUECG_RUNNER_DIR={{VALUECG_DIR}} \
       --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
-      --mount=type=bind,source={{TARGET_PATH}}/tmp,target=/tmp \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
@@ -327,7 +326,6 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --language java \
       --compress \
       --debug
-    rm -rf {{TARGET_PATH}}/tmp
 
 [private]
 doop_callgraphs: (static_callgraph "Doop" "0-CFA") (static_callgraph "Doop" "1-CFA") (static_callgraph "Doop" "1-CFA+HEAP") (static_callgraph "Doop" "1OBJ-CFA") (static_callgraph "Doop" "1TYP-CFA") (static_callgraph "Doop" "1TYP-CFA+HEAP") (static_callgraph "Doop" "1OBJ-1TYP-CFA+HEAP")
