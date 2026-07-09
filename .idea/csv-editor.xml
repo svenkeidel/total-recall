@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/projects/antlr-4.13.2/seed-corpus/csv/examples/example1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

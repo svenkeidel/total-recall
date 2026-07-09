@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="axion-1.0-M2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/fuzzing-corpora/fatjars/seed-corpus/axion-1.0-M2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

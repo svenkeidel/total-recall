@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.7.0
-Created-By: 1.5.0_11-b03 (Sun Microsystems Inc.)
-Main-Class: edu.umd.cs.findbugs.LaunchAppropriateUI
-Class-Path: bcel.jar dom4j-1.6.1.jar jaxen-1.1.1.jar asm-3.1.jar asm-t
- ree-3.1.jar asm-commons-3.1.jar jsr305.jar jFormatString.jar commons-
- lang-2.4.jar mysql-connector-java-5.1.7-bin.jar
-

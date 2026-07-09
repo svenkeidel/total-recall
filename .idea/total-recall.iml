@@ -15,5 +15,6 @@
     <orderEntry type="library" name="commons-codec-1.2" level="project" />
     <orderEntry type="library" name="xercesImpl" level="project" />
     <orderEntry type="library" name="adjust_line_numbers_to_pc" level="project" />
+    <orderEntry type="library" name="axion-1.0-M2" level="project" />
   </component>
 </module>

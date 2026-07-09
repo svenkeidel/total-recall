@@ -4,6 +4,5 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/fuzzing-corpora/sql/sqlancer" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/fuzzing-corpora/sql/sqlsmith" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/projects/antlr-4.13.2/grammars-v4" vcs="Git" />
   </component>
 </project>
