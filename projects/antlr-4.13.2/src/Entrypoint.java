@@ -26,7 +26,13 @@ import org.antlr.v4.tool.LexerGrammar;
 
 public class Entrypoint {
 
+    private static long processed = 0;
+    private static long total = 0;
+
     public static void entrypoint(Path inputDirectory) throws Exception {
+
+        System.out.println(String.format("[%d/%d]: %s", processed, total, inputDirectory.toString()));
+
         try (Stream<Path> grammarFilesStream = Files.find(inputDirectory, Integer.MAX_VALUE, (path, attr) -> attr.isRegularFile() && path.toString().toLowerCase().endsWith(".g4"))) {
             Set<Path> grammarFiles = grammarFilesStream.collect(Collectors.toSet());
             if(grammarFiles.size() == 1) {
@@ -39,6 +45,8 @@ public class Entrypoint {
             }
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
+        } finally {
+            processed += 1;
         }
     }
 
@@ -131,8 +139,9 @@ public class Entrypoint {
     }
 
     public static void main(String args[]) throws Exception {
+        try (Stream<Path> stream = Files.walk(Paths.get(args[0]), 1)) { Entrypoint.total = stream.filter(Files::isRegularFile).count(); }
         try(Stream<Path> files = Files.walk(Paths.get(args[0]), 1)) {
-            for(Path inputDirectory: (Iterable<Path>) files.filter(Files::isDirectory)::iterator) {
+            for(Path inputDirectory: (Iterable<Path>) files.sorted().filter(Files::isDirectory)::iterator) {
                 Entrypoint.entrypoint(inputDirectory);
             }
         }

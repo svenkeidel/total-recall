@@ -25,30 +25,33 @@ public class Entrypoint {
 
             try {
                 converter.execute();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace(System.err);
             }
 
             try {
                 converter.setDestinationType(DestinationType.JPEG);
                 converter.execute();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace(System.err);
             }
 
             try {
                 converter.setDestinationType(DestinationType.TIFF);
                 converter.execute();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace(System.err);
             }
 
             try {
                 converter.setDestinationType(DestinationType.PDF);
                 converter.execute();
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 exc.printStackTrace(System.err);
             }
+        } catch (StackOverflowError exc) {
+            exc.printStackTrace(System.err);
+            System.exit(1);
         } catch (Throwable exc) {
             exc.printStackTrace(System.err);
         } finally {
