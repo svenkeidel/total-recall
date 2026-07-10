@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="jgrapht-1.5.3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/projects/jgrapht-1.5.3/target/repo" />
+    </CLASSES>
+    <JAVADOC />
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/projects/jgrapht-1.5.3/target/repo" />
+    </NATIVE>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/projects/jgrapht-1.5.3/target/repo" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/projects/jgrapht-1.5.3/target/repo" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/projects/jgrapht-1.5.3/target/repo" recursive="false" type="SOURCES" />
+  </library>
+</component>

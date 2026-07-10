@@ -4,5 +4,6 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/fuzzing-corpora/sql/sqlancer" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/fuzzing-corpora/sql/sqlsmith" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/projects/spotbugs-4.9.8/spotbugs" vcs="Git" />
   </component>
 </project>
