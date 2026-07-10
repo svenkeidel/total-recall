@@ -11,6 +11,17 @@ public class Entrypoint {
             FindBugs2.main(new String[] {
                     "-effort:max",
                     "-experimental",
+                    "-low", // report all bugs
+                    "-relaxed", // Relaxed reporting mode. For many detectors, this option suppresses the heuristics used to avoid reporting false positives.
+                    "-chooseVisitors", "+DontReusePublicIdentifiers,+CheckExpectedWarnings,+UselessSubclassMethod," +
+                                       "+InefficientMemberAccess,+PublicSemaphores,+FindCircularDependencies," +
+                                       "+BadAppletConstructor,+InefficientToArray,+InefficientIndexOf," +
+                                       "+InefficientInitializationInsideLoop,+CovariantArrayAssignment," +
+                                       "+CallToUnsupportedMethod,+EmptyZipFileEntry,+NoiseNullDeref,+ResolveAllReferences," +
+                                       "+CheckCalls,+ViewCFG,+TestASM," +
+                                       "+FindNonSerializableValuePassedToWriteObject,+FindNonSerializableStoreIntoSession",
+                    "-sortByClass",
+                    "-progress",
                     "-auxclasspath", jdk26.toString(),
                     jar.toString(),
             });
