@@ -128,7 +128,7 @@ RUN git clone --branch ${DOOP_BRANCH} --single-branch --shallow-since="2026-01-0
 
 ## install JCG (11.07.2026)
 ARG JCG_BRANCH="develop"
-ARG JCG_REVISION="491a57703e57dac0cdf930518ad9838036754084"
+ARG JCG_REVISION="0b1a3814b15e425e2ea8b021549b81ddc7f93f0b"
 ARG JCG_DIR="/home/$USER/JCG"
 RUN git clone --branch ${JCG_BRANCH} --single-branch --shallow-since="2026-01-01" https://github.com/svenkeidel/JCG.git $JCG_DIR && \
     cd $JCG_DIR && \
