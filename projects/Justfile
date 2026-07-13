@@ -276,6 +276,7 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         --language java \
         --truth-callgraph-directory /dynamiccg \
         --comparison-name package \
+        {{if FRAMEWORK == "ValueCG" { "--false-positive-closure-size --false-negative-closure-size" } else { "" } }} \
         --reachable-methods-include "L$COMPARE_PACKAGE.*" \
         --edge-include ".*L$COMPARE_PACKAGE.*"
 
