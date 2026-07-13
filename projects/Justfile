@@ -302,9 +302,9 @@ VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
     mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
-    docker rm -f {{STATICCG_CONTAINER}}
+    docker rm -f {{STATICCG_CONTAINER}}-{{FRAMEWORK}}-{{replace(ALGO,"+","-")}}
     docker run -it --rm \
-      --name {{STATICCG_CONTAINER}} \
+      --name {{STATICCG_CONTAINER}}-{{FRAMEWORK}}-{{replace(ALGO,"+","-")}} \
       --env VALUECG_RUNNER_DIR={{VALUECG_DIR}} \
       --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
