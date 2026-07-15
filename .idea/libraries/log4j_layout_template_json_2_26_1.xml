@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="log4j-layout-template-json-2.26.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/projects/log4j-2.26.1/repo/log4j-layout-template-json-2.26.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
