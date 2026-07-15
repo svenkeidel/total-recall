@@ -231,15 +231,10 @@ dynamic_callgraph_add_declared_targets EXPERIMENT:
 
 dynamic_callgraph_add_declared_targets_fuzzing_seed: (dynamic_callgraph_add_declared_targets "fuzzing_seed")
 
-compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
-    if [ ! -f {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz ]; then \
-        echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \
-        exit 0; \
-    fi
-    if [ ! -f {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/$PROJECT-callgraph.json.gz ]; then \
-        echo "cannot find static call graph {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/$PROJECT-callgraph.json.gz"; \
-        exit 0; \
-    fi
+compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image (compare_all EXPERIMENT FRAMEWORK ALGO) (compare_package EXPERIMENT FRAMEWORK ALGO) (compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO)
+
+compare_all EXPERIMENT FRAMEWORK ALGO:
+    # Compare all
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
@@ -259,6 +254,8 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         --language java \
         --truth-callgraph-directory /dynamiccg \
         --comparison-name all
+
+compare_package EXPERIMENT FRAMEWORK ALGO:
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
@@ -280,6 +277,30 @@ compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image
         {{if FRAMEWORK == "ValueCG" { "--false-positive-closure-size --false-negative-closure-size" } else { "" } }} \
         --reachable-methods-include "L$COMPARE_PACKAGE.*" \
         --edge-include ".*L$COMPARE_PACKAGE.*"
+
+compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO:
+    docker rm -f {{COMPARECG_CONTAINER}}
+    docker run -it --rm \
+      --name {{COMPARECG_CONTAINER}} \
+      --mount=type=bind,source=/dev/null,target=/log.txt \
+      --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
+      --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
+      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      {{JCG_IMAGE}} \
+      {{COMPARECG_TIMEOUT}} \
+      {{COMPARECG_MEMORY}} \
+      runMain Commandline precision-recall \
+        --projects-directory /jcg-conf/ \
+        --call-graphs-directory /staticcg \
+        --adapter {{FRAMEWORK}} \
+        --algorithm-prefix {{ALGO}} \
+        --language java \
+        --truth-callgraph-directory /dynamiccg \
+        --comparison-name package-without-jdk \
+        {{if FRAMEWORK == "ValueCG" { "--false-positive-closure-size --false-negative-closure-size" } else { "" } }} \
+        --reachable-methods-include "L$COMPARE_PACKAGE.*" \
+        --edge-include ".*L$COMPARE_PACKAGE.*" \
+        --edge-exclude ".*L(java|javax|jakarta|jdk|sun|com\.sun|org\.w3c\.dom|org\.xml\.sax).*"
 
 [private]
 compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "0-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1-CFA+HEAP") (compare_callgraph "fuzzing_seed" "Doop" "1OBJ-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1TYP-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1TYP-CFA+HEAP") (compare_callgraph "fuzzing_seed" "Doop" "1OBJ-1TYP-CFA+HEAP")
