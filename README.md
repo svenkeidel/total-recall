@@ -13,10 +13,10 @@ To reproduce our findings on a smaller scale - and for a single project - run th
 
 * `cd ./projects/axion/` - Change into a specific project directory to run commands only that project (here: `axion`)
 * `just clean` - *Optionally* remove all intermediate results that we shipped for this project - you can also keep those, then subsequent commands will build ontop of them
-* `just FUZZING_TIME="600" coverage_fuzzing_seed` - Run fuzzing with our base coporus for ten minutes to generate additional inputs for the project.
+* `just FUZZING_TIME="600" coverage` - Run fuzzing with our base coporus for ten minutes to generate additional inputs for the project.
    * If you are interested in the coverage that the fuzzing run achieved, look into `./target/fuzzing_seed/coverage` for a full HTML report
    * You can execute this command repeatedly to generate further inputs and increase coverage
-* `just dynamic_callgraph_fuzzing_seed` - Record a dynamic callgraph with all inputs generated via fuzzing so far
+* `just dynamic_callgraph` - Record a dynamic callgraph with all inputs generated via fuzzing so far
 * `just static_callgraphs` - Compute all static callgraphs for this project
    * Note that this might require a lot of RAM (126GB or higher) and time (multiple hours).
    * If you do not have those resources available, you can also copy the static callgraphs we computed for all our projects from this artifact's supplementary material.
@@ -66,29 +66,29 @@ We conducted our experiments on a benchmark of four projects (`axion`, `batik`, 
 |- <...>
 |- projects
 | |-- axion
-| | |--- .env
+| | |--- Justfile
 | | ╹--- <...>
 | |-- batik
-| | |--- .env
+| | |--- Justfile
 | | ╹--- <...>
 | |-- jasml
-| | |--- .env
+| | |--- Justfile
 | | ╹--- <...>
 | |-- xerces
-| | |--- .env
+| | |--- Justfile
 | | ╹--- <...>
 | ╹-- Justfile
 ╹- Justfile
 ```
 
 ### Run Recipes for a Single Project
-To execute recipes for a single project of the benchmark, you first need to change into the respective project directory. For example, run `cd ./projects/batik` in the root directory to be able to run recipes for the `batik` project. Each project holds a `.env` file that configures project-specific variables and settings. To load those settings, simply run the following for any given recipe:
+To execute recipes for a single project of the benchmark, you first need to change into the respective project directory. For example, run `cd ./projects/batik` in the root directory to be able to run recipes for the `batik` project. Then simply run the following for any given recipe:
 
 ```
-just --dotenv-filename .env <recipe_name>
+just <recipe_name>
 ```
 
-For example, you can run `just --dotenv-filename .env clean` to clean all data for the current project. The following recipes are available for individual projects:
+For example, you can run `just clean` to clean all data for the current project. The following recipes are available for individual projects:
 
 | Recipe       | Requires | Description | Outputs To |
 |--------------|:-----:|-----------|:-----:|
@@ -114,10 +114,10 @@ The most important parameters in our case are:
 **To reproduce our core experiments**, one would typically want to build a reasonably large input corpus using the fuzzer, then record the dynamic callgraph, compute all static callgraphs, and finally compute the precision and recall for all static callgraphs given the dynamic one. This would be done by executing the following commands (with 10 minutes of fuzzing):
 
 ```
-just --dotenv-filename .env FUZZING_TIME="600" coverage_fuzzing_seed
-just --dotenv-filename .env dynamic_callgraph_fuzzing_seed
-just --dotenv-filename .env static_callgraphs
-just --dotenv-filename .env compare_callgraphs
+just FUZZING_TIME="600" coverage_fuzzing_seed
+just dynamic_callgraph_fuzzing_seed
+just static_callgraphs
+just compare_callgraphs
 ```
 
 **NOTE:** Some recipes may take a very long time to execute. Especially `static_callgraphs` will require a lot of resources and may take many hours to complete. Recording a dynamic callgraph via `dynamic_callgraph_fuzzing_seed` may also take several hours, or even days, dependending on the resources available and the size of the input corpus.
@@ -159,12 +159,6 @@ This artifact contains a number of intermediate results that are meant to enable
 * The results of `build_plots`. These are the visualizations that we used for our paper. (`./plot/results`)
 
 The results of `static_callgraphs` for all projects are available as an additional supplementary archive, as their compressed filesize is around 1GB. It contains a dedicated README that holds installation instructions.
-
-### Validating our Claims
-In our paper, we answered three research questions (RQs) based on the data contained in / obtained by this artifact. The following data was used for the corresponding RQs:
-* **RQ1**: Quality of our dynamic callgraphs. Here we used the input set achieved by combining all input generation techniques to judge whether our approach yields sensible program coverages. The corresponding data can be found in `./projects/<project>/target/fuzzing_seed/coverage`.
-* **RQ2**: Influence of individual input generation techniques. To judge which technique yields the most coverage, we compared the data available in `./projects/<project>/target/fuzzing_seed/coverage` (all techniques), `./projects/<project>/target/fuzzing/coverage`(fuzzing without base corpus), `./projects/<project>/target/base_seed/coverage` (pre-existing input corpus only) and `./projects/<project>/target/seed/coverage` (pre-existing input corpus with manual extensions).
-* **RQ3**: Comparing static call graphs. We compared the precision- and recall-values for all benchmark programs and all static callgraphs by inspecting the plots generated via `just build_plots`, which can be found in `./plot/results`.
 
 ### Extending the benchmark
 Conceptually, a couple of steps need to be taken to add new projects to the benchmark. One has to:
