@@ -1,0 +1,13 @@
+PROJECT := 'batik-1.19'
+INSTRUMENT_CLASSES := 'org.apache.batik.**'
+COVERAGE_INCLUDES := 'org.apache.batik.**'
+COVERAGE_EXCLUDES := '''
+'''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/svg/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/svg/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+
+import '../Justfile'

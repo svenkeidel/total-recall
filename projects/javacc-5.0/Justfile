@@ -1,0 +1,12 @@
+PROJECT := 'javacc-5.0'
+INSTRUMENT_CLASSES := 'org.javacc.**'
+COVERAGE_INCLUDES := 'org.javacc.**'
+COVERAGE_EXCLUDES := ''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/javacc/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/javacc/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+
+import '../Justfile'

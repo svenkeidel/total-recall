@@ -1,0 +1,11 @@
+PROJECT := 'antlr-4.13.2'
+INSTRUMENT_CLASSES := 'org.antlr.**'
+COVERAGE_INCLUDES := 'org.antlr.**'
+COVERAGE_EXCLUDES := ""
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+	cp -r  {{PROJECT_PATH}}/seed-corpus {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+
+import '../Justfile'

@@ -1,0 +1,10 @@
+PROJECT := 'log4j-2.26.1'
+INSTRUMENT_CLASSES := 'org.apache.logging.log4j.**'
+COVERAGE_INCLUDES := 'org.apache.logging.log4j.**'
+COVERAGE_EXCLUDES := ''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+
+import '../Justfile'

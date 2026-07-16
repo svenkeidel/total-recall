@@ -1,0 +1,17 @@
+PROJECT := 'axion-1.0-M2'
+INSTRUMENT_CLASSES := 'org.axiondb.**'
+COVERAGE_INCLUDES := 'org.axiondb.**'
+COVERAGE_EXCLUDES := "org.axiondb.jdbc.AxionDatabaseMetaData\
+org.axiondb.engine.MemoryDatabase\
+org.axiondb.engine.MemoryTable\
+org.axiondb.engine.MemoryTableFactory"
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/sql/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/sql/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+    cp -r {{PROJECT_PATH}}/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    python3 {{PROJECT_PATH}}/generate-corpus/gen_sql.py {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+
+import '../Justfile'

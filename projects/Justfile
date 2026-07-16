@@ -1,14 +1,12 @@
-set dotenv-load := true
 set shell := ["bash", "-uc"]
 
 export DOCKER_BUILDKIT := "1"
 
-export BASE_DIR := absolute_path("../")
+export BASE_DIR := absolute_path("../../")
 
-PROJECT := env_var("PROJECT")
-
-export PROJECT_PATH := absolute_path(PROJECT)
+export PROJECT_PATH := absolute_path(".")
 export TARGET_PATH := PROJECT_PATH / "target"
+ALL_TESTCASES := replace_regex(shell("find "+PROJECT_PATH+" -maxdepth 1 -name '*.conf' -printf '%f'"), '.conf', '')
 
 FUZZER := capitalize(PROJECT) + "Fuzzer"
 CUSTOM_MUTATOR := env_var_or_default("CUSTOM_MUTATOR", "")
@@ -38,7 +36,6 @@ JAZZER_API_JAR := BASE_DIR / "lib/jazzer-api-0.19.0.jar"
 ADJUST_LINE_NUMBERS_TO_PC_JAR := BASE_DIR / "lib/adjust_line_numbers_to_pc-1.0.0-SNAPSHOT.jar"
 JACOCO := BASE_DIR / "lib/jacoco"
 
-export JAVA_VERSION := shell("jq \".java\" " + PROJECT_PATH + "/jcg.conf")
 UID := `id -u`
 GID := `id -g`
 
@@ -46,10 +43,6 @@ DISABLED_HOOKS:= "\
 com.code_intelligence.jazzer.sanitizers.ReflectiveCall:\
 com.code_intelligence.jazzer.sanitizers.SqlInjection:\
 com.code_intelligence.jazzer.sanitizers.ServerSideRequestForgery"
-
-[private]
-build_xcorpus_image:
-    docker build --tag=xcorpus -f {{BASE_DIR}}/java-corpora/xcorpus/xcorpus.Dockerfile {{BASE_DIR}}/java-corpora/xcorpus
 
 [private]
 build_jazzer_input_parser:
@@ -71,35 +64,28 @@ build_jcg_image:
       --build-arg GID={{GID}} \
       {{BASE_DIR}}/jcg
 
-build_project: clean_project_build build_xcorpus_image build_jazzer_input_parser
-    mkdir -p {{TARGET_PATH}}
-    cp -r {{PROJECT_PATH}}/repo {{TARGET_PATH}}/repo
-    cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
-    cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
-
-    docker buildx build \
-      --tag={{lowercase(PROJECT)}} \
-      --build-arg PROJECT=$PROJECT \
-      --output type=tar,dest={{TARGET_PATH}}/repo.tar \
-      -f {{PROJECT_PATH}}/../build-java$JAVA_VERSION.Dockerfile \
-      {{PROJECT_PATH}}
-
-    tar xf {{TARGET_PATH}}/repo.tar -C {{TARGET_PATH}}
-    rm {{TARGET_PATH}}/repo.tar {{TARGET_PATH}}/jazzer-api.jar {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
-
-
 [private]
-prepare_corpus EXPERIMENT:
-    mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
-    if [ -f  {{PROJECT_PATH}}/prepare_base_corpus.sh ]; then \
-      {{PROJECT_PATH}}/prepare_base_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus; \
-    fi
-    if [ -f  {{PROJECT_PATH}}/prepare_seed_corpus.sh ]; then \
-      {{PROJECT_PATH}}/prepare_seed_corpus.sh {{TARGET_PATH}}/{{EXPERIMENT}}/corpus; \
-    fi
-    if [ -f  {{PROJECT_PATH}}/prepare_dictionary.sh ]; then \
-      {{PROJECT_PATH}}/prepare_dictionary.sh {{TARGET_PATH}}/{{EXPERIMENT}}; \
-    fi
+[script("bash")]
+build_java *CASES=ALL_TESTCASES: clean_project_build build_jazzer_input_parser
+    for testcase in {{CASES}}; do
+        mkdir -p {{TARGET_PATH}}/repo/$testcase
+        cp -r {{PROJECT_PATH}}/repo {{TARGET_PATH}}/repo/$testcase
+        cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
+        cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
+
+        JAVA_VERSION=`jq ".java" {{PROJECT_PATH}}/$testcase.conf`
+        OUTPUT_TAR={{TARGET_PATH}}/repo-$testcase.tar
+
+        docker buildx build \
+          --tag=$testcase \
+          --build-arg PROJECT=$testcase \
+          --output type=tar,dest=$OUTPUT_TAR \
+          -f {{BASE_DIR}}/build-java/java$JAVA_VERSION.Dockerfile \
+          {{PROJECT_PATH}}
+
+        tar xf $OUTPUT_TAR -C {{TARGET_PATH}}/repo/$testcase
+        rm $OUTPUT_TAR {{TARGET_PATH}}/jazzer-api.jar {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
+    done
 
 
 fuzz EXPERIMENT: (prepare_corpus EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
@@ -175,9 +161,8 @@ coverage_report EXPERIMENT COVERAGE_DIR EXCLUDE_CLASSES:
 
     rm -rf {{TARGET_PATH}}/classes
 
-
-[private]
-dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPERIMENT)
+[script("bash")]
+dynamic_callgraph EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES: build_jcg_image build_project (prepare_corpus EXPERIMENT)
     mkdir -p {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/tmp {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt
     docker rm -f {{DYNCG_CONTAINER}}
@@ -188,52 +173,47 @@ dynamic_callgraph EXPERIMENT: build_project build_jcg_image (prepare_corpus EXPE
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/corpus,target=/corpus,readonly \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}},target=/projects/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg,target=/dyncg \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/log.txt,target=/log.txt \
       {{JCG_IMAGE}} \
       {{DYNCG_TIMEOUT}} \
       {{DYNCG_MEMORY}} \
       runMain Commandline analyze \
-      --projects-directory /jcg-conf/ \
-      --call-graphs-directory /dyncg \
-      --adapter Dynamic \
-      --algorithm-prefix Dynamic \
-      --project-prefix $PROJECT \
-      --analysis-args /corpus \
-      --language java \
-      --compress \
-      --debug
+          --projects-directory /projects/ \
+          --projects {{CASES}} \
+          --call-graphs-directory /dyncg \
+          --adapter Dynamic \
+          --algorithm-prefix Dynamic \
+          --analysis-args /corpus \
+          --language java \
+          --compress \
+          --debug;
 
-dynamic_callgraph_fuzzing_seed: (dynamic_callgraph "fuzzing_seed")
-
-[private]
-dynamic_callgraph_add_declared_targets EXPERIMENT:
-    if [ ! -f {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz ]; then \
-        echo "cannot find dynamic call graph {{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/Dynamic/Dynamic/$PROJECT-callgraph.json.gz"; \
-        exit 0; \
-    fi
+[script("bash")]
+dynamic_callgraph_add_declared_targets EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES:
     docker rm -f {{DYNCG_CONTAINER}}-add-declared-targets
     docker run -it --rm \
       --name {{DYNCG_CONTAINER}}-add-declared-targets \
       --memory={{DYNCG_MEMORY}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}},target=/projects/,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg,target=/dyncg \
       {{JCG_IMAGE}} \
       {{DYNCG_TIMEOUT}} \
       {{DYNCG_MEMORY}} \
       runMain Commandline dynamic-callgraph-add-declared-targets \
-      --projects-directory /jcg-conf/ \
+      --projects-directory /projects/ \
+      --projects {{CASES}} \
       --call-graphs-directory /dyncg \
-      --project-prefix $PROJECT \
       --language java
 
-dynamic_callgraph_add_declared_targets_fuzzing_seed: (dynamic_callgraph_add_declared_targets "fuzzing_seed")
+[private]
+compare_callgraph FRAMEWORK ALGO EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES: (compare_all EXPERIMENT FRAMEWORK ALGO CASES) (compare_package EXPERIMENT FRAMEWORK ALGO CASES) (compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO CASES)
 
-compare_callgraph EXPERIMENT FRAMEWORK ALGO: build_jcg_image (compare_all EXPERIMENT FRAMEWORK ALGO) (compare_package EXPERIMENT FRAMEWORK ALGO) (compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO)
-
-compare_all EXPERIMENT FRAMEWORK ALGO:
+[private]
+[script("bash")]
+compare_all FRAMEWORK ALGO EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES:
     # Compare all
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it --rm \
@@ -242,12 +222,13 @@ compare_all EXPERIMENT FRAMEWORK ALGO:
       --mount=type=bind,source=/dev/null,target=/log.txt \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}},target=/projects/,readonly \
       {{JCG_IMAGE}} \
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
       runMain Commandline precision-recall \
-        --projects-directory /jcg-conf/ \
+        --projects-directory /projects/ \
+        --projects {{CASES}} \
         --call-graphs-directory /staticcg \
         --adapter {{FRAMEWORK}} \
         --algorithm-prefix {{ALGO}} \
@@ -255,19 +236,22 @@ compare_all EXPERIMENT FRAMEWORK ALGO:
         --truth-callgraph-directory /dynamiccg \
         --comparison-name all
 
-compare_package EXPERIMENT FRAMEWORK ALGO:
+[private]
+[script("bash")]
+compare_package FRAMEWORK ALGO EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES:
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}},target=/projects/,readonly \
       {{JCG_IMAGE}} \
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
       runMain Commandline precision-recall \
-        --projects-directory /jcg-conf/ \
+        --projects-directory /projects/ \
+        --projects {{CASES}} \
         --call-graphs-directory /staticcg \
         --adapter {{FRAMEWORK}} \
         --algorithm-prefix {{ALGO}} \
@@ -278,19 +262,22 @@ compare_package EXPERIMENT FRAMEWORK ALGO:
         --reachable-methods-include "L$COMPARE_PACKAGE.*" \
         --edge-include ".*L$COMPARE_PACKAGE.*"
 
-compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO:
+[private]
+[script("bash")]
+compare_package_without_jdk FRAMEWORK ALGO  EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES:
     docker rm -f {{COMPARECG_CONTAINER}}
     docker run -it --rm \
       --name {{COMPARECG_CONTAINER}} \
       --mount=type=bind,source=/dev/null,target=/log.txt \
       --mount=type=bind,source={{TARGET_PATH}}/{{EXPERIMENT}}/dyncg/,target=/dynamiccg,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/,target=/staticcg \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}},target=/projects/,readonly \
       {{JCG_IMAGE}} \
       {{COMPARECG_TIMEOUT}} \
       {{COMPARECG_MEMORY}} \
       runMain Commandline precision-recall \
-        --projects-directory /jcg-conf/ \
+        --projects-directory /projects/ \
+        --projects {{CASES}} \
         --call-graphs-directory /staticcg \
         --adapter {{FRAMEWORK}} \
         --algorithm-prefix {{ALGO}} \
@@ -302,27 +289,20 @@ compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO:
         --edge-include ".*L$COMPARE_PACKAGE.*" \
         --edge-exclude ".*L(java|javax|jakarta|jdk|sun|com\.sun|org\.w3c\.dom|org\.xml\.sax).*"
 
-[private]
-compare_doop: (compare_callgraph "fuzzing_seed" "Doop" "0-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1-CFA+HEAP") (compare_callgraph "fuzzing_seed" "Doop" "1OBJ-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1TYP-CFA") (compare_callgraph "fuzzing_seed" "Doop" "1TYP-CFA+HEAP") (compare_callgraph "fuzzing_seed" "Doop" "1OBJ-1TYP-CFA+HEAP")
-[private]
-compare_opal: (compare_callgraph "fuzzing_seed" "OPAL" "CHA") (compare_callgraph "fuzzing_seed" "OPAL" "RTA") (compare_callgraph "fuzzing_seed" "OPAL" "CTA") (compare_callgraph "fuzzing_seed" "OPAL" "FTA") (compare_callgraph "fuzzing_seed" "OPAL" "XTA") (compare_callgraph "fuzzing_seed" "OPAL" "0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "0-1-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-0-CFA") (compare_callgraph "fuzzing_seed" "OPAL" "1-1-CFA")
-[private]
-compare_soot: (compare_callgraph "fuzzing_seed" "Soot" "CHA") (compare_callgraph "fuzzing_seed" "Soot" "RTA") (compare_callgraph "fuzzing_seed" "Soot" "VTA") (compare_callgraph "fuzzing_seed" "Soot" "SPARK")
-[private]
-compare_sootup: (compare_callgraph "fuzzing_seed" "SootUp" "CHA") (compare_callgraph "fuzzing_seed" "SootUp" "RTA")
-[private]
-compare_taie: (compare_callgraph "fuzzing_seed" "Taie" "CHA") (compare_callgraph "fuzzing_seed" "Taie" "PTA")
-[private]
-compare_valuecg: (compare_callgraph "fuzzing_seed" "ValueCG" "fast") (compare_callgraph "fuzzing_seed" "ValueCG" "precise")
-[private]
-compare_wala: (compare_callgraph "fuzzing_seed" "WALA" "CHA") (compare_callgraph "fuzzing_seed" "WALA" "RTA") (compare_callgraph "fuzzing_seed" "WALA" "0-CFA") (compare_callgraph "fuzzing_seed" "WALA" "1-CFA") (compare_callgraph "fuzzing_seed" "WALA" "0-1-CFA")
+compare_doop: (compare_callgraph "Doop" "0-CFA") (compare_callgraph "Doop" "1-CFA") (compare_callgraph "Doop" "1-CFA+HEAP") (compare_callgraph "Doop" "1OBJ-CFA") (compare_callgraph "Doop" "1TYP-CFA") (compare_callgraph "Doop" "1TYP-CFA+HEAP") (compare_callgraph "Doop" "1OBJ-1TYP-CFA+HEAP")
+compare_opal: (compare_callgraph "OPAL" "CHA") (compare_callgraph "OPAL" "RTA") (compare_callgraph "OPAL" "CTA") (compare_callgraph "OPAL" "FTA") (compare_callgraph "OPAL" "XTA") (compare_callgraph "OPAL" "0-CFA") (compare_callgraph "OPAL" "0-1-CFA") (compare_callgraph "OPAL" "1-0-CFA") (compare_callgraph "OPAL" "1-1-CFA")
+compare_soot: (compare_callgraph "Soot" "CHA") (compare_callgraph "Soot" "RTA") (compare_callgraph "Soot" "VTA") (compare_callgraph "Soot" "SPARK")
+compare_sootup: (compare_callgraph "SootUp" "CHA") (compare_callgraph "SootUp" "RTA")
+compare_taie: (compare_callgraph "Taie" "CHA") (compare_callgraph "Taie" "PTA")
+compare_valuecg: (compare_callgraph "ValueCG" "fast") (compare_callgraph "ValueCG" "precise")
+compare_wala: (compare_callgraph "WALA" "CHA") (compare_callgraph "WALA" "RTA") (compare_callgraph "WALA" "0-CFA") (compare_callgraph "WALA" "1-CFA") (compare_callgraph "WALA" "0-1-CFA")
 
 compare_callgraphs: compare_doop compare_opal compare_soot compare_sootup compare_taie compare_wala
 
 VALUECG_DIR := "/home/JCG/valuecg"
 VALUECG_CONFIG_DIR := "/home/JCG/valuecg_conf"
 
-static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
+static_callgraph FRAMEWORK ALGO *CASES=ALL_TESTCASES: build_jcg_image build_project
     mkdir -p {{TARGET_PATH}}/staticcg {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/ {{PROJECT_PATH}}/resources/
     touch {{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt
     docker rm -f {{STATICCG_CONTAINER}}-{{FRAMEWORK}}-{{replace(ALGO,"+","-")}}
@@ -332,7 +312,7 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       --env VALUECG_CONFIG_DIR={{VALUECG_CONFIG_DIR}} \
       --mount=type=bind,source={{TARGET_PATH}}/repo,target=/repo,readonly \
       --mount=type=bind,source={{PROJECT_PATH}}/resources/,target=/resources/,readonly \
-      --mount=type=bind,source={{PROJECT_PATH}}/jcg.conf,target=/jcg-conf/$PROJECT.conf,readonly \
+      --mount=type=bind,source={{PROJECT_PATH}}/,target=/projects,readonly \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg,target=/staticcg \
       --mount=type=bind,source={{TARGET_PATH}}/staticcg/{{FRAMEWORK}}/{{ALGO}}/log.txt,target=/log.txt \
       --mount=type=bind,source={{BASE_DIR}}/jcg/valuecg,target={{VALUECG_DIR}} \
@@ -341,11 +321,11 @@ static_callgraph FRAMEWORK ALGO: build_project build_jcg_image
       {{STATICCG_TIMEOUT}} \
       {{STATICCG_MEMORY}} \
       runMain Commandline analyze \
-      --projects-directory /jcg-conf/ \
+      --projects-directory /projects/ \
+      --projects {{CASES}} \
       --call-graphs-directory /staticcg \
       --adapter {{FRAMEWORK}} \
       --algorithm-prefix {{ALGO}} \
-      --project-prefix $PROJECT \
       --language java \
       --compress \
       --debug

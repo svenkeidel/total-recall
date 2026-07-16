@@ -1,0 +1,13 @@
+PROJECT := 'spotbugs-4.9.8'
+INSTRUMENT_CLASSES := 'edu.umd.cs.findbugs.**'
+CUSTOM_MUTATOR := 'libzipcompressionmutator.so'
+COVERAGE_INCLUDES := 'edu.umd.cs.findbugs.**'
+COVERAGE_EXCLUDES := ''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{PROJECT_PATH}}/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/fatjars/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+
+import '../Justfile'

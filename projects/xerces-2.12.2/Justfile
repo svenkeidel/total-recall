@@ -1,0 +1,14 @@
+PROJECT := 'xerces-2.12.2'
+INSTRUMENT_CLASSES := 'org.apache.**:org.w3c.**'
+COVERAGE_INCLUDES := 'org.apache.**:org.w3c.**'
+COVERAGE_EXCLUDES := ""
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/xml/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/xml/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+
+    cp -r {{PROJECT_PATH}}/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    python3 {{PROJECT_PATH}}/adapt_resource_refs.py {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+import '../Justfile'

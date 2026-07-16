@@ -1,0 +1,12 @@
+PROJECT := 'proguard-7.9.1'
+INSTRUMENT_CLASSES := 'proguard.**'
+COVERAGE_INCLUDES := 'proguard.**'
+COVERAGE_EXCLUDES := ""
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/fatjars/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/fatjars/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+
+import '../Justfile'

@@ -1,0 +1,13 @@
+PROJECT := 'jasml-0.10'
+INSTRUMENT_CLASSES := 'com.jasml.**'
+COVERAGE_INCLUDES := 'com.jasml.**'
+COVERAGE_EXCLUDES := ''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+    cp -r {{BASE_DIR}}/fuzzing-corpora/jvm-bytecode/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+    cp -r {{BASE_DIR}}/fuzzing-corpora/jvm-bytecode/dict.txt {{TARGET_PATH}}/{{EXPERIMENT}}/dict.txt
+    cp -r $PROJECT_PATH/seed-corpus/* {{TARGET_PATH}}/{{EXPERIMENT}}/corpus
+
+import '../Justfile'

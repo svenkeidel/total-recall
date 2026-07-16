@@ -13,7 +13,7 @@ BASE_DIR := absolute_path(".")
 PLOT_DIR := absolute_path(".") / "plot"
 
 for_all_projects RECIPE *ARGS:
-    for project in $(ls projects); do \
+    for project in $(ls -d projects/*/); do \
         just \
           --justfile projects/Justfile \
           --dotenv-filename projects/$project/.env \

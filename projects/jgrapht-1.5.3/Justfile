@@ -1,0 +1,10 @@
+PROJECT := 'jgrapht-1.5.3'
+INSTRUMENT_CLASSES := 'org.jgrapht.**'
+COVERAGE_INCLUDES := 'org.jgrapht.**'
+COVERAGE_EXCLUDES := ''
+
+build_project: build_java
+
+prepare_corpus EXPERIMENT:
+
+import '../Justfile'
