@@ -66,26 +66,24 @@ build_jcg_image:
 
 [private]
 [script("bash")]
-build_java *CASES=ALL_TESTCASES: clean_project_build build_jazzer_input_parser
-    for testcase in {{CASES}}; do
-        mkdir -p {{TARGET_PATH}}/repo/$testcase
-        cp -r {{PROJECT_PATH}}/repo {{TARGET_PATH}}/repo/$testcase
+build_java CASE=ALL_TESTCASES: clean_project_build build_jazzer_input_parser
+        mkdir -p {{TARGET_PATH}}/repo/
+        cp -r {{PROJECT_PATH}}/repo {{TARGET_PATH}}/repo/
         cp {{JAZZER_API_JAR}} {{TARGET_PATH}}/jazzer-api.jar
         cp {{ADJUST_LINE_NUMBERS_TO_PC_JAR}} {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
 
-        JAVA_VERSION=`jq ".java" {{PROJECT_PATH}}/$testcase.conf`
-        OUTPUT_TAR={{TARGET_PATH}}/repo-$testcase.tar
+        JAVA_VERSION=`jq ".java" {{PROJECT_PATH}}/{{CASE}}.conf`
+        OUTPUT_TAR={{TARGET_PATH}}/repo-{{CASE}}.tar
 
         docker buildx build \
-          --tag=$testcase \
-          --build-arg PROJECT=$testcase \
+          --tag={{CASE}} \
+          --build-arg PROJECT={{CASE}} \
           --output type=tar,dest=$OUTPUT_TAR \
           -f {{BASE_DIR}}/build-java/java$JAVA_VERSION.Dockerfile \
           {{PROJECT_PATH}}
 
-        tar xf $OUTPUT_TAR -C {{TARGET_PATH}}/repo/$testcase
+        tar xf $OUTPUT_TAR -C {{TARGET_PATH}}/repo/
         rm $OUTPUT_TAR {{TARGET_PATH}}/jazzer-api.jar {{TARGET_PATH}}/adjust_line_numbers_to_pc.jar
-    done
 
 
 fuzz EXPERIMENT: (prepare_corpus EXPERIMENT) build_project build_jazzer_image && (coverage_report EXPERIMENT "fuzzing_coverage" "true")
