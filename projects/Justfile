@@ -207,7 +207,7 @@ dynamic_callgraph_add_declared_targets EXPERIMENT="fuzzing_seed" *CASES=ALL_TEST
       --language java
 
 [private]
-compare_callgraph FRAMEWORK ALGO EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES: (compare_all EXPERIMENT FRAMEWORK ALGO CASES) (compare_package EXPERIMENT FRAMEWORK ALGO CASES) (compare_package_without_jdk EXPERIMENT FRAMEWORK ALGO CASES)
+compare_callgraph FRAMEWORK ALGO EXPERIMENT="fuzzing_seed" *CASES=ALL_TESTCASES: (compare_all FRAMEWORK ALGO EXPERIMENT CASES) (compare_package FRAMEWORK ALGO EXPERIMENT CASES) (compare_package_without_jdk FRAMEWORK ALGO EXPERIMENT CASES)
 
 [private]
 [script("bash")]
