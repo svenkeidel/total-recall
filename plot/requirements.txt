@@ -3,7 +3,7 @@ charset-normalizer==3.2.0
 contourpy==1.1.0
 cycler==0.11.0
 fonttools==4.41.1
-idna==3.4
+idna==3.15
 kiwisolver==1.4.4
 numpy==1.25.1
 packaging==23.1
